@@ -8,6 +8,7 @@
 #include <scene/materials/phongmaterial.h>
 #include <raytracing/samplers/uniformpixelsampler.h>
 #include <raytracing/samplers/stratifiedpixelsampler.h>
+#include <QImage>
 
 void XMLReader::LoadSceneFromFile(QFile &file, const QStringRef &local_path, Scene &scene, Integrator &integrator)
 {
@@ -38,7 +39,7 @@ void XMLReader::LoadSceneFromFile(QFile &file, const QStringRef &local_path, Sce
                 }
                 else if(QString::compare(tag, QString("material")) == 0)
                 {
-                    Material* material = LoadMaterial(xml_reader);
+                    Material* material = LoadMaterial(xml_reader, local_path);
                     if(material == NULL)
                     {
                         return;
@@ -169,7 +170,7 @@ Geometry* XMLReader::LoadGeometry(QXmlStreamReader &xml_reader, QMap<QString, QL
     return result;
 }
 
-Material* XMLReader::LoadMaterial(QXmlStreamReader &xml_reader)
+Material* XMLReader::LoadMaterial(QXmlStreamReader &xml_reader, const QStringRef &local_path)
 {
     Material* result;
     //First check what type of material we're supposed to load
@@ -249,6 +250,28 @@ Material* XMLReader::LoadMaterial(QXmlStreamReader &xml_reader)
                 {
                     result->emissive = true;
                 }
+            }
+            xml_reader.readNext();
+        }
+        else if(QString::compare(tag, QString("texture")) == 0)
+        {
+            xml_reader.readNext();
+            if(xml_reader.isCharacters())
+            {
+                QString img_filepath = local_path.toString().append(xml_reader.text().toString());
+                QImage* texture = new QImage(img_filepath);
+                result->texture = texture;
+            }
+            xml_reader.readNext();
+        }
+        else if(QString::compare(tag, QString("normalMap")) == 0)
+        {
+            xml_reader.readNext();
+            if(xml_reader.isCharacters())
+            {
+                QString img_filepath = local_path.toString().append(xml_reader.text().toString());
+                QImage* texture = new QImage(img_filepath);
+                result->normal_map = texture;
             }
             xml_reader.readNext();
         }
