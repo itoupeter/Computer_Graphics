@@ -10,7 +10,7 @@ static const int SPH_VERT_COUNT = 382;
 glm::vec2 Sphere::GetUVCoordinates( const glm::vec3 &point ){
 
     float phi( atan2f( point[ 2 ] , point[ 0 ] ) );
-    float theta( acosf( -point[ 1 ] ) );
+    float theta( acosf( 2.f * point[ 1 ] ) );
 
     if( phi < 0.f ) phi += TWO_PI;
 
