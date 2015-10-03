@@ -1,6 +1,10 @@
 #include <scene/geometry/square.h>
 
-Intersection SquarePlane::GetIntersection(Ray r)
+glm::vec2 SquarePlane::GetUVCoordinates( const glm::vec3 &point ){
+    return glm::vec2( point[ 0 ] + .5f, point[ 1 ] + .5f );
+}
+
+Intersection SquarePlane::SquarePlane::GetIntersection(Ray r)
 {
     //---Q5---
     //TODO
@@ -15,6 +19,7 @@ Intersection SquarePlane::GetIntersection(Ray r)
     if( glm::abs( result.point[ 0 ] ) > .5f ) return Intersection();
     if( glm::abs( result.point[ 1 ] ) > .5f ) return Intersection();
 
+    result.color = material->GetImageColor( GetUVCoordinates( result.point ), material->texture ) * material->base_color;
     result.point = glm::vec3( transform.T() * glm::vec4( result.point, 1.f ) );
     result.normal = glm::vec3( transform.invTransT() * glm::vec4( 0.f, 0.f, 1.f, 0.f ) );
     result.t = glm::length( result.point - rInWorld.origin );

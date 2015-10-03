@@ -47,6 +47,23 @@ glm::vec4 Triangle::GetNormal(const glm::vec4 &position)
     return glm::vec4(result, 0);
 }
 
+glm::vec2 Triangle::GetUVCoordinates( const glm::vec3 &point ){
+
+    glm::vec3 v01( points[ 1 ] - points[ 0 ] );
+    glm::vec3 v02( points[ 2 ] - points[ 0 ] );
+
+    glm::vec3 p0( points[ 0 ] - point );
+    glm::vec3 p1( points[ 1 ] - point );
+    glm::vec3 p2( points[ 2 ] - point );
+
+    float s( glm::length( glm::cross( v01, v02 ) ) );
+    float s0( glm::length( glm::cross( p1, p2 ) ) );
+    float s1( glm::length( glm::cross( p0, p2 ) ) );
+    float s2( glm::length( glm::cross( p0, p1 ) ) );
+
+    return ( s0 * uvs[ 0 ] + s1 * uvs[ 1 ] + s2 * uvs[ 2 ] ) / s;
+}
+
 //HAVE THEM IMPLEMENT THIS
 //The ray in this function is not transformed because it was *already* transformed in Mesh::GetIntersection
 Intersection Triangle::GetIntersection(Ray r)
@@ -67,6 +84,7 @@ Intersection Triangle::GetIntersection(Ray r)
     glm::vec3 vp0( points[ 0 ] - p );
     glm::vec3 vp1( points[ 1 ] - p );
     glm::vec3 vp2( points[ 2 ] - p );
+
     float s = glm::length( glm::cross( v01, v02 ) );
     float s0 = glm::length( glm::cross( vp1, vp2 ) ) / s;
     float s1 = glm::length( glm::cross( vp0, vp2 ) ) / s;
@@ -82,8 +100,13 @@ Intersection Triangle::GetIntersection(Ray r)
     result.point = r.origin + t * r.direction;
     result.t = t;
     result.object_hit = this;
+    result.color = material->GetImageColor( GetUVCoordinates( result.point ), material->texture ) * material->base_color;
 
     return result;
+}
+
+glm::vec2 Mesh::GetUVCoordinates( const glm::vec3 &point ){
+    return glm::vec2( 0.f, 0.f );
 }
 
 Intersection Mesh::GetIntersection(Ray r)
@@ -111,7 +134,7 @@ Intersection Mesh::GetIntersection(Ray r)
     if( result.object_hit == NULL ) return result;
 
     result.point = glm::vec3( transform.T() * glm::vec4( result.point, 1.f ) );
-    result.normal = glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) );
+    result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) ) );
     result.t = glm::length( result.point - rInWorld.origin );
     result.object_hit = this;
 

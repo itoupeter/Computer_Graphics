@@ -13,6 +13,7 @@ class Intersection
 public:
     Intersection();
 
+    glm::vec3 color;
     glm::vec3 point;      //The place at which the intersection occurred
     glm::vec3 normal;     //The surface normal at the point of intersection
     float t;              //The parameterization for the ray (in world space) that generated this intersection.

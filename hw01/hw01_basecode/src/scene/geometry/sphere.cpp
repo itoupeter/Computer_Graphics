@@ -7,6 +7,16 @@
 static const int SPH_IDX_COUNT = 2280;  // 760 tris * 3
 static const int SPH_VERT_COUNT = 382;
 
+glm::vec2 Sphere::GetUVCoordinates( const glm::vec3 &point ){
+
+    float phi( atan2f( point[ 2 ] , point[ 0 ] ) );
+    float theta( acosf( -point[ 1 ] ) );
+
+    if( phi < 0.f ) phi += TWO_PI;
+
+    return glm::vec2( 1 - phi / TWO_PI, 1 - theta / PI );
+}
+
 Intersection Sphere::GetIntersection(Ray r)
 {
     //---Q5---
@@ -33,6 +43,7 @@ Intersection Sphere::GetIntersection(Ray r)
         result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( pointInLocal, 0.f ) ) );
         result.t = glm::distance( result.point, rInWorld.origin );
         result.object_hit = this;
+        result.color = material->GetImageColor( GetUVCoordinates( pointInLocal ), material->texture ) * material->base_color;
 
         return result;
 
@@ -45,6 +56,7 @@ Intersection Sphere::GetIntersection(Ray r)
         result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( pointInLocal, 0.f ) ) );
         result.t = glm::distance( result.point, rInWorld.origin );
         result.object_hit = this;
+        result.color = material->GetImageColor( GetUVCoordinates( pointInLocal ), material->texture ) * material->base_color;
 
         return result;
 

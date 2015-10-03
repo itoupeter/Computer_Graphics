@@ -8,5 +8,6 @@ class Sphere : public Geometry
 {
 public:
     Intersection GetIntersection(Ray r);
+    virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
     void create();
 };

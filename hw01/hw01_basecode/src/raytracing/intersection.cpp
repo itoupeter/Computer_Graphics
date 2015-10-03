@@ -1,9 +1,10 @@
 #include <raytracing/intersection.h>
 
 Intersection::Intersection():
-    point(glm::vec3(0)),
-    normal(glm::vec3(0)),
-    t(-1)
+    color( glm::vec3( 0.f ) ),
+    point( glm::vec3( 0 ) ),
+    normal( glm::vec3( 0 ) ),
+    t( -1 )
 {
     object_hit = NULL;
 }
@@ -24,7 +25,7 @@ Intersection IntersectionEngine::GetIntersection(Ray r)
 
         intersection = ( *i )->GetIntersection( r );
 
-        if( intersection.object_hit && min_t > intersection.t && min_t > scene->camera.near_clip ){
+        if( intersection.object_hit && min_t > intersection.t ){
             min_t = intersection.t;
             result = intersection;
         }

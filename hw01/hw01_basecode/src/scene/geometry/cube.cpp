@@ -5,6 +5,54 @@
 static const int CUB_IDX_COUNT = 36;
 static const int CUB_VERT_COUNT = 24;
 
+glm::vec2 Cube::GetUVCoordinates(const glm::vec3 &point){
+
+    static const float a[]{
+        point[ 0 ], point[ 0 ], point[ 1 ], point[ 1 ], point[ 2 ], point[ 2 ],
+    };
+
+    static const float b[]{
+        -.5f, .5f, -.5f, .5f, -.5f, .5f,
+    };
+
+    int hit_face;
+
+    for( hit_face = 0; hit_face < 6 && !fequal( a[ hit_face ], b[ hit_face ] ); ++hit_face );
+
+    assert( hit_face < 6 );
+
+    float x, y;
+
+    switch( hit_face ){
+    case 0:
+       x = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
+       y = ( point[ 2 ] + .5f ) / 4.f ;
+       break;
+    case 1:
+       x = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
+       y = ( .5f - point[ 2 ] ) / 4.f + 2.f / 4.f;
+       break;
+    case 2:
+       x = ( .5f - point[ 2 ] ) / 3.f + 2.f / 3.f;
+       y = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
+       break;
+    case 3:
+       x = ( point[ 2 ] + .5f ) / 3.f;
+       y = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
+       break;
+    case 4:
+       x = ( point[ 2 ] + .5f ) / 3.f;
+       y = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
+       break;
+    case 5:
+       x = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
+       y = ( .5f - point[ 0 ] ) / 4.f + 3.f / 4.f;
+       break;
+    }
+
+    return glm::vec2( x, y );
+}
+
 Intersection Cube::GetIntersection(Ray r)
 {
     //---Q5---
@@ -46,7 +94,7 @@ Intersection Cube::GetIntersection(Ray r)
         }
     }
 
-    if( t_near + EPS > t_far ){
+    if( t_near + EPS > t_far || t_near - EPS < 0.f ){
         return Intersection();
     }
 
@@ -102,9 +150,10 @@ Intersection Cube::GetIntersection(Ray r)
         result.normal = glm::vec3( 0, 0, 1 );
         break;
     }
-    result.normal = glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) );
+    result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) ) );
     result.t = glm::distance( result.point, rInWorld.origin );
     result.object_hit = this;
+    result.color = material->GetImageColor( GetUVCoordinates( hit ), material->texture ) * material->base_color;
 
     return result;
 }
