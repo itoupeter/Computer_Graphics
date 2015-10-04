@@ -21,36 +21,36 @@ glm::vec2 Cube::GetUVCoordinates(const glm::vec3 &point){
 
     assert( hit_face < 6 );
 
-    float x, y;
+    float U, V;
 
     switch( hit_face ){
     case 0:
-       x = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
-       y = ( point[ 2 ] + .5f ) / 4.f ;
+       U = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
+       V = ( point[ 2 ] + .5f ) / 4.f ;
        break;
     case 1:
-       x = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
-       y = ( .5f - point[ 2 ] ) / 4.f + 2.f / 4.f;
+       U = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
+       V = ( .5f - point[ 2 ] ) / 4.f + 2.f / 4.f;
        break;
     case 2:
-       x = ( .5f - point[ 2 ] ) / 3.f + 2.f / 3.f;
-       y = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
+       U = ( .5f - point[ 2 ] ) / 3.f + 2.f / 3.f;
+       V = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
        break;
     case 3:
-       x = ( point[ 2 ] + .5f ) / 3.f;
-       y = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
+       U = ( point[ 2 ] + .5f ) / 3.f;
+       V = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
        break;
     case 4:
-       x = ( point[ 2 ] + .5f ) / 3.f;
-       y = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
+       U = ( point[ 2 ] + .5f ) / 3.f;
+       V = ( point[ 0 ] + .5f ) / 4.f + 1.f / 4.f;
        break;
     case 5:
-       x = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
-       y = ( .5f - point[ 0 ] ) / 4.f + 3.f / 4.f;
+       U = ( point[ 1 ] + .5f ) / 3.f + 1.f / 3.f;
+       V = ( .5f - point[ 0 ] ) / 4.f + 3.f / 4.f;
        break;
     }
 
-    return glm::vec2( x, y );
+    return glm::vec2( U, V );
 }
 
 Intersection Cube::GetIntersection(Ray r)
@@ -60,7 +60,7 @@ Intersection Cube::GetIntersection(Ray r)
     Ray rInWorld( r );
     r = r.GetTransformedCopy( transform.invT() );
 
-    static const float EPS = 1e-5;
+    static const float EPS = 1e-4;
     float t_near = -1e6;
     float t_far = 1e6;
 

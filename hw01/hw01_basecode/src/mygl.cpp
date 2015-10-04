@@ -240,13 +240,11 @@ void MyGL::RaytraceScene()
                     scene.film.pixels[ i ][ j ] = glm::vec3( 0.f, 0.f, 0.f );
                 }else{
                     scene.film.pixels[ i ][ j ] = integrator.TraceRay( ray, 0 );
-//                    scene.film.pixels[ i ][ j ] = glm::vec3( 1.f, 1.f, 1.f );
-//                    scene.film.pixels[ i ][ j ] = intersection.normal * .5f + .5f;
                 }
             }
         }
 
-        std::cout << "OK";
+        std::cout << "OK" << std::endl;
     #endif
     scene.film.WriteImage(filepath);
 }

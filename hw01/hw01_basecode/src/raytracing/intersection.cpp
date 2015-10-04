@@ -1,7 +1,7 @@
 #include <raytracing/intersection.h>
 
 Intersection::Intersection():
-    color( glm::vec3( 0.f ) ),
+    color( glm::vec3( 1.f ) ),
     point( glm::vec3( 0 ) ),
     normal( glm::vec3( 0 ) ),
     t( -1 )
@@ -21,11 +21,11 @@ Intersection IntersectionEngine::GetIntersection(Ray r)
     float min_t = 1e6;
     Intersection intersection, result;
 
-    for( QList<Geometry*>::iterator i = scene->objects.begin(); i != scene->objects.end(); ++i ){
+    for( QList< Geometry* >::iterator i = scene->objects.begin(); i != scene->objects.end(); ++i ){
 
         intersection = ( *i )->GetIntersection( r );
 
-        if( intersection.object_hit && min_t > intersection.t ){
+        if( intersection.object_hit != NULL && min_t > intersection.t ){
             min_t = intersection.t;
             result = intersection;
         }

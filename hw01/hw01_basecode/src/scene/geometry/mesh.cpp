@@ -70,7 +70,7 @@ Intersection Triangle::GetIntersection(Ray r)
 {
     //---Q5---
     //TODO
-    static const float EPS = 1e-5;
+    static const float EPS = 1e-4;
 
     glm::vec3 v01( points[ 1 ] - points[ 0 ] );
     glm::vec3 v02( points[ 2 ] - points[ 0 ] );
@@ -96,7 +96,7 @@ Intersection Triangle::GetIntersection(Ray r)
 
     Intersection result;
 
-    result.normal = GetNormal( p );
+    result.normal = glm::normalize( GetNormal( p ) );
     result.point = r.origin + t * r.direction;
     result.t = t;
     result.object_hit = this;

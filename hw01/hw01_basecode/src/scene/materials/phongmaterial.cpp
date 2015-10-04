@@ -11,10 +11,13 @@ PhongMaterial::PhongMaterial(const glm::vec3 &color):
 
 glm::vec3 PhongMaterial::EvaluateReflectedEnergy(const Intersection &isx, const glm::vec3 &outgoing_ray, const glm::vec3 &incoming_ray)
 {
-    glm::vec3 H( .5f * ( outgoing_ray - incoming_ray ) );
+    glm::vec3 L( glm::normalize( -incoming_ray ) );
+    glm::vec3 V( glm::normalize( outgoing_ray ) );
+    glm::vec3 N( isx.normal );
+    glm::vec3 H( .5f * ( V + L ) );
 
-    float D( glm::dot( -incoming_ray, isx.normal ) );
-    float S( glm::pow( glm::dot( isx.normal, H ), specular_power ) );
+    float D( glm::max( glm::dot( L, N ), 0.f ) );
+    float S( glm::pow( glm::max( glm::dot( N, H ), 0.f ), specular_power ) );
 
     float Kd( .6f );
     float Ks( .3f );
