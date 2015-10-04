@@ -63,63 +63,64 @@ glm::vec3 Integrator::TraceRay(Ray r, unsigned int depth)
     }
 
     //---hit non-light---
-    Geometry *pLight( scene->lights[ 0 ] );
+    for( Geometry *pLight : scene->lights ){
+        //---local illumination---
+        bool isEntering( glm::dot( r.direction, isx.normal ) < 0 );
+        glm::vec3 dir_light_isx( isx.point - pLight->transform.position() );
+        glm::vec3 ERE( pMaterial->EvaluateReflectedEnergy( isx, -r.direction, dir_light_isx ) );
 
-    //---local illumination---
-    bool isEntering( glm::dot( r.direction, isx.normal ) < 0 );
-    glm::vec3 dir_light_isx( isx.point - pLight->transform.position() );
-    glm::vec3 ERE( pMaterial->EvaluateReflectedEnergy( isx, -r.direction, dir_light_isx ) );
-
-    if( pMaterial->refract_idx_in < .1f ){
-        //---opaque---
-        result += ( 1 - pMaterial->reflectivity )
-                * isx.color
-                * ERE
-                * ShadowTest( isx_origin_out, pLight );
-    }else{
-        //---transparent---
-        if( isEntering ){
-            float eta( pMaterial->refract_idx_out / pMaterial->refract_idx_in );
-            glm::vec3 new_ray_o( isx_origin_in );
-            glm::vec3 new_ray_d( glm::refract( r.direction, isx.normal, eta ) );
-            Ray new_ray( new_ray_o, new_ray_d );
-
+        if( pMaterial->refract_idx_in < .1f ){
+            //---opaque---
             result += ( 1 - pMaterial->reflectivity )
                     * isx.color
-                    * TraceRay( new_ray, depth + 1 );
+                    * ERE
+                    * ShadowTest( isx_origin_out, pLight );
         }else{
-            float eta( pMaterial->refract_idx_in / pMaterial->refract_idx_out );
-            glm::vec3 new_ray_o( isx_origin_out );
-            glm::vec3 new_ray_d( glm::refract( r.direction, -isx.normal, eta ) );
-            Ray new_ray( new_ray_o, new_ray_d );
+            //---transparent---
+            if( isEntering ){
+                float eta( pMaterial->refract_idx_out / pMaterial->refract_idx_in );
+                glm::vec3 new_ray_o( isx_origin_in );
+                glm::vec3 new_ray_d( glm::refract( r.direction, isx.normal, eta ) );
+                Ray new_ray( new_ray_o, new_ray_d );
 
-            result += ( 1 - pMaterial->reflectivity )
-                    * isx.color
-                    * TraceRay( new_ray, depth + 1 );
+                result += ( 1 - pMaterial->reflectivity )
+                        * isx.color
+                        * TraceRay( new_ray, depth + 1 );
+            }else{
+                float eta( pMaterial->refract_idx_in / pMaterial->refract_idx_out );
+                glm::vec3 new_ray_o( isx_origin_out );
+                glm::vec3 new_ray_d( glm::refract( r.direction, -isx.normal, eta ) );
+                Ray new_ray( new_ray_o, new_ray_d );
+
+                result += ( 1 - pMaterial->reflectivity )
+                        * isx.color
+                        * TraceRay( new_ray, depth + 1 );
+            }
         }
+
+        //---reflected color---
+        bool isReflected( true );
+
+        //---test total reflection---
+        if( !isEntering ){
+            float eta( pMaterial->refract_idx_in / pMaterial->refract_idx_out );
+            glm::vec3 new_ray_d( glm::refract( r.direction, -isx.normal, eta ) );
+
+            if( !fequal( glm::length2( new_ray_d ), 0.f ) ) isReflected = false;
+        }
+
+        if( isReflected && pMaterial->reflectivity > EPS ){
+            glm::vec3 new_ray_o( isx_origin_out );
+            glm::vec3 new_ray_d( glm::reflect( r.direction, isx.normal ) );
+
+            result += pMaterial->reflectivity
+                    * isx.color
+                    * TraceRay( Ray( new_ray_o, new_ray_d ), depth + 1 );
+        }
+
     }
 
-    //---reflected color---
-    bool isReflected( true );
-
-    //---test total reflection---
-    if( !isEntering ){
-        float eta( pMaterial->refract_idx_in / pMaterial->refract_idx_out );
-        glm::vec3 new_ray_d( glm::refract( r.direction, -isx.normal, eta ) );
-
-        if( !fequal( glm::length2( new_ray_d ), 0.f ) ) isReflected = false;
-    }
-
-    if( isReflected && pMaterial->reflectivity > EPS ){
-        glm::vec3 new_ray_o( isx_origin_out );
-        glm::vec3 new_ray_d( glm::reflect( r.direction, isx.normal ) );
-
-        result += pMaterial->reflectivity
-                * isx.color
-                * TraceRay( Ray( new_ray_o, new_ray_d ), depth + 1 );
-    }
-
-    return result;
+    return result / ( float )scene->lights.size();
 }
 
 
