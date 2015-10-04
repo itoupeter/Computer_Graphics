@@ -207,14 +207,14 @@ void MyGL::RaytraceScene()
     {
         return;
     }
-    //#define TBB //Uncomment this line out to render your scene with multiple threads.
+    #define TBB //Uncomment this line out to render your scene with multiple threads.
     //This is useful when debugging your raytracer with breakpoints.
     #ifdef TBB
         parallel_for(0, (int)scene.camera.width, 1, [=](unsigned int i)
         {
             for(unsigned int j = 0; j < scene.camera.height; j++)
             {
-                //---Q7---
+                ///---Q7---
                 //TODO
                 Ray ray( gl_camera.Raycast( i, j ) );
                 Intersection intersection( intersection_engine.GetIntersection( ray ) );
@@ -222,7 +222,7 @@ void MyGL::RaytraceScene()
                 if( intersection.object_hit == NULL ){
                     scene.film.pixels[ i ][ j ] = glm::vec3( 0.f, 0.f, 0.f );
                 }else{
-                    scene.film.pixels[ i ][ j ] = intersection.normal * .5f + .5f;
+                    scene.film.pixels[ i ][ j ] = integrator.TraceRay( ray, 0 );
                 }
             }
         });
@@ -244,7 +244,7 @@ void MyGL::RaytraceScene()
             }
         }
 
-        std::cout << "OK" << std::endl;
     #endif
+    std::cout << "OK" << std::endl;
     scene.film.WriteImage(filepath);
 }
