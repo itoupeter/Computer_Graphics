@@ -5,6 +5,10 @@
 static const int CUB_IDX_COUNT = 36;
 static const int CUB_VERT_COUNT = 24;
 
+void Cube::computeBounds(){
+
+}
+
 glm::vec2 Cube::GetUVCoordinates(const glm::vec3 &point){
 
     static const float a[]{

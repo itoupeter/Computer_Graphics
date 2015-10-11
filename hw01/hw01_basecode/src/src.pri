@@ -28,7 +28,10 @@ SOURCES += \
     $$PWD/raytracing/samplers/stratifiedpixelsampler.cpp \
     $$PWD/raytracing/samplers/uniformpixelsampler.cpp \
     $$PWD/scene/materials/phongmaterial.cpp \
-    $$PWD/scene/materials/lambertmaterial.cpp
+    $$PWD/scene/materials/lambertmaterial.cpp \
+    $$PWD/scene/boundingbox.cpp \
+    $$PWD/scene/bvh.cpp \
+    $$PWD/scene/bvhnode.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -62,4 +65,8 @@ HEADERS += \
     $$PWD/raytracing/samplers/stratifiedpixelsampler.h \
     $$PWD/raytracing/samplers/uniformpixelsampler.h \
     $$PWD/scene/materials/lambertmaterial.h \
-    $$PWD/scene/materials/phongmaterial.h
+    $$PWD/scene/materials/phongmaterial.h \
+    $$PWD/scene/boundingbox.h \
+    $$PWD/scene/bvhnode.h \
+    $$PWD/scene/materials/bvh.h \
+    $$PWD/scene/bvh.h

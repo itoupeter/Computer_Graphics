@@ -3,10 +3,12 @@
 #include <scene/geometry/geometry.h>
 #include <raytracing/ray.h>
 #include <scene/scene.h>
+#include "scene/bvhnode.h"
 
 class Material;
 class Geometry;
 class Scene;
+class BVHNode;
 
 class Intersection
 {
@@ -28,4 +30,7 @@ public:
     Scene *scene;
 
     Intersection GetIntersection(Ray r);
+
+    //---bounding box---
+    BVHNode* root;
 };

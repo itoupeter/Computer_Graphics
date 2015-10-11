@@ -7,6 +7,10 @@
 static const int SPH_IDX_COUNT = 2280;  // 760 tris * 3
 static const int SPH_VERT_COUNT = 382;
 
+void Sphere::computeBounds(){
+
+}
+
 glm::vec2 Sphere::GetUVCoordinates( const glm::vec3 &point ){
 
     float phi( atan2f( point[ 2 ] , point[ 0 ] ) );

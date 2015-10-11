@@ -3,6 +3,12 @@
 #include <tinyobj/tiny_obj_loader.h>
 #include <iostream>
 
+void Triangle::computeBounds(){
+
+    BoundingBox bbox;
+
+}
+
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3):
     Triangle(p1, p2, p3, glm::vec3(1), glm::vec3(1), glm::vec3(1), glm::vec2(0), glm::vec2(0), glm::vec2(0))
 {
@@ -103,6 +109,10 @@ Intersection Triangle::GetIntersection(Ray r)
     result.color = material->GetImageColor( GetUVCoordinates( result.point ), material->texture ) * material->base_color;
 
     return result;
+}
+
+void Mesh::computeBounds(){
+
 }
 
 glm::vec2 Mesh::GetUVCoordinates( const glm::vec3 &point ){

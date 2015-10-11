@@ -1,5 +1,9 @@
 #include <scene/geometry/square.h>
 
+void SquarePlane::computeBounds(){
+
+}
+
 glm::vec2 SquarePlane::GetUVCoordinates( const glm::vec3 &point ){
     return glm::vec2( point[ 0 ] + .5f, point[ 1 ] + .5f );
 }

@@ -25,6 +25,9 @@ INPUT(
 ./release\uniformpixelsampler.o
 ./release\phongmaterial.o
 ./release\lambertmaterial.o
+./release\boundingbox.o
+./release\bvh.o
+./release\bvhnode.o
 ./release\qrc_glsl.o
 ./release\moc_mainwindow.o
 ./release\moc_mygl.o

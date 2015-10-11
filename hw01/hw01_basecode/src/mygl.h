@@ -49,6 +49,10 @@ public:
 
     void RaytraceScene();
 
+    //---BVH---
+    void clearBVH();
+    void recreateBVH();
+
 protected:
     void keyPressEvent(QKeyEvent *e);
 

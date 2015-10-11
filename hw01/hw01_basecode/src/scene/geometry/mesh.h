@@ -11,6 +11,7 @@ public:
     Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3, const glm::vec2 &t1, const glm::vec2 &t2, const glm::vec2 &t3);
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
+    virtual void computeBounds();
 
     glm::vec3 points[3];
     glm::vec3 normals[3];
@@ -32,6 +33,7 @@ class Mesh : public Geometry
 public:
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
+    virtual void computeBounds();
     void SetMaterial(Material *m);
     void create();
     void LoadOBJ(const QStringRef &filename, const QStringRef &local_path);

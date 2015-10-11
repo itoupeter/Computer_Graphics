@@ -25,6 +25,9 @@ INPUT(
 ./debug\uniformpixelsampler.o
 ./debug\phongmaterial.o
 ./debug\lambertmaterial.o
+./debug\boundingbox.o
+./debug\bvh.o
+./debug\bvhnode.o
 ./debug\qrc_glsl.o
 ./debug\moc_mainwindow.o
 ./debug\moc_mygl.o
