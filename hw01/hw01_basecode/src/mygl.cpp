@@ -7,9 +7,11 @@
 #include <QXmlStreamReader>
 #include <QFileDialog>
 #include <tbb/tbb.h>
+#include "scene/bvh.h"
 
 using namespace tbb;
 
+BoundingBox MyGL::boundingBox = BoundingBox();
 
 MyGL::MyGL(QWidget *parent)
     : GLWidget277(parent)
@@ -195,9 +197,18 @@ void MyGL::SceneLoadDialog()
     intersection_engine = IntersectionEngine();
     //Load new objects based on the XML file chosen.
     xml_reader.LoadSceneFromFile(file, local_path, scene, integrator);
+    for( Geometry *pGeometry : scene.objects ){
+        pGeometry->computeBounds();
+    }
     integrator.scene = &scene;
     integrator.intersection_engine = &intersection_engine;
     intersection_engine.scene = &scene;
+
+    //---
+    BVH::scene = &scene;
+    BVH::clear( intersection_engine.root );
+    BVH::build( scene.objects, intersection_engine.root, 0 );
+    //---
 }
 
 void MyGL::RaytraceScene()

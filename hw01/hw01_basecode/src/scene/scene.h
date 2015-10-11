@@ -4,9 +4,11 @@
 #include <scene/camera.h>
 #include <raytracing/samplers/pixelsampler.h>
 #include <scene/geometry/geometry.h>
+#include "scene/boundingbox.h"
 
 class Geometry;
 class Material;
+class BoundingBox;
 
 class Scene
 {
@@ -18,6 +20,9 @@ public:
     Camera camera;
     Film film;
     PixelSampler* pixel_sampler;
+
+    //---all bounding boxes---
+    QList< BoundingBox * > allBBoxes;
 
     void SetCamera(const Camera &c);
 

@@ -8,13 +8,10 @@
 #include <openGL/shaderprogram.h>
 #include <scene/camera.h>
 #include <scene/scene.h>
-#include <la.h>
-#include <scene/xmlreader.h>
-#include <raytracing/integrator.h>
 #include <scene/xmlreader.h>
 #include <raytracing/integrator.h>
 
-
+#include "scene/boundingbox.h"
 
 class MyGL
     : public GLWidget277
@@ -52,6 +49,8 @@ public:
     //---BVH---
     void clearBVH();
     void recreateBVH();
+
+    static BoundingBox boundingBox;
 
 protected:
     void keyPressEvent(QKeyEvent *e);

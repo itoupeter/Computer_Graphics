@@ -4,9 +4,6 @@
 #include <iostream>
 
 void Triangle::computeBounds(){
-
-    BoundingBox bbox;
-
 }
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3):
@@ -20,8 +17,9 @@ Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3
 
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3):
-    Triangle(p1, p2, p3, n1, n2, n3, glm::vec2(0), glm::vec2(0), glm::vec2(0))
-{}
+    Triangle(p1, p2, p3, n1, n2, n3, glm::vec2(0), glm::vec2(0), glm::vec2(0)){
+
+}
 
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3, const glm::vec2 &t1, const glm::vec2 &t2, const glm::vec2 &t3)
@@ -113,6 +111,26 @@ Intersection Triangle::GetIntersection(Ray r)
 
 void Mesh::computeBounds(){
 
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( Triangle *triangle : faces ){
+
+        //---transform vertices to the world space---
+        glm::vec4 vertices_in_world[]{
+            transform.T() * glm::vec4( triangle->points[ 0 ], 1.f ),
+            transform.T() * glm::vec4( triangle->points[ 1 ], 1.f ),
+            transform.T() * glm::vec4( triangle->points[ 2 ], 1.f ),
+        };
+
+        //---decide bounds---
+        for( int i = 0; i < 3; ++i ){
+            max_bound = glm::max( max_bound, glm::vec3( vertices_in_world[ i ] ) );
+            min_bound = glm::min( min_bound, glm::vec3( vertices_in_world[ i ] ) );
+        }
+    }
+
+    pBBox = new BoundingBox( max_bound, min_bound );
 }
 
 glm::vec2 Mesh::GetUVCoordinates( const glm::vec3 &point ){

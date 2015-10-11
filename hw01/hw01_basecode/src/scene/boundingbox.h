@@ -9,6 +9,7 @@ class Geometry;
 class BoundingBox : public Drawable{
 public:
     BoundingBox();
+    BoundingBox( const glm::vec3 &max_bound, const glm::vec3 &min_bound );
 
     void setBounds( const glm::vec3 &max_bound, const glm::vec3 &min_bound );
 

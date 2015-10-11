@@ -6,10 +6,12 @@
 
 class BVH{
 public:
-    BVH();
+    static Scene *scene;
 
-    void buildBVH( QList< Geometry* >  &geometries, BVHNode* pBVHNode, int depth );
-    void clear();
+    static void build( QList< Geometry* >  &geometries, BVHNode* pBVHNode, int depth );
+    static void clear( BVHNode * pBVHNode );
 };
+
+Scene *BVH::scene = NULL;
 
 #endif // BVH_H

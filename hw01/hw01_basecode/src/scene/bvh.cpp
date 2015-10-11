@@ -1,6 +1,8 @@
 
 #include "scene/bvh.h"
 #include <algorithm>
+#include <QMessageBox>
+
 
 bool compareX( const Geometry *a, const Geometry *b ){
     return a->pBBox->center[ 0 ] < b->pBBox->center[ 0 ];
@@ -14,16 +16,19 @@ bool compareZ( const Geometry *a, const Geometry *b ){
     return a->pBBox->center[ 2 ] < b->pBBox->center[ 2 ];
 }
 
-void BVH::buildBVH( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
+void BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
 
-    //---no geometries---
+    //---no geometry---
     if( geometries.size() == 0 ){
+        QMessageBox msg;
+        msg.setText( "No geometry in the scene." );
+        msg.exec();
         return;
     }
 
-    //---attach geometris array to current node---
+    //---current node---
     pNode->pGeometries = &geometries;
-    pNode->bbox = new BoundingBox( BoundingBox::combine( geometries ) );
+    pNode->pBBox = new BoundingBox( BoundingBox::combine( geometries ) );
 
     //---reach leaf node---
     if( geometries.size() == 1 ){
@@ -31,11 +36,12 @@ void BVH::buildBVH( QList< Geometry * > &geometries, BVHNode *pNode, int depth )
     }
 
     //---sort geometries according to X/Y/Z axis---
-//    bool ( *compareFunc )( const Geometry *, const Geometry * )[]{
-//        compareX, compareY, compareX,
-//    };
+    typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
+    static CompareFunc compareFunc[]{
+        compareX, compareY, compareZ,
+    };
 
-    std::sort( geometries.begin(), geometries.end(), compareX );
+    std::sort( geometries.begin(), geometries.end(), compareFunc[ depth % 3 ] );
 
     //---split into children nodes---
     int size( geometries.size() );
@@ -47,10 +53,11 @@ void BVH::buildBVH( QList< Geometry * > &geometries, BVHNode *pNode, int depth )
     pLeft->pGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
     pRight->pGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
 
-    pLeft->bbox = NULL;
-    pRight->bbox = NULL;
+    pLeft->pBBox = NULL;
+    pRight->pBBox = NULL;
 
     //---build tree recurrently---
-    buildBVH( *pLeft->pGeometries, pLeft, depth + 1 );
-    buildBVH( *pRight->pGeometries, pRight, depth + 1 );
+    build( *pLeft->pGeometries, pLeft, depth + 1 );
+    build( *pRight->pGeometries, pRight, depth + 1 );
+
 }

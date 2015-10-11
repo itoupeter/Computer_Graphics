@@ -13,6 +13,7 @@
 Scene::Scene()
 {
     pixel_sampler = new UniformPixelSampler();
+    allBBoxes.clear();
 }
 
 void Scene::SetCamera(const Camera &c)

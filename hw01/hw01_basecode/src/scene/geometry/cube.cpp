@@ -7,6 +7,24 @@ static const int CUB_VERT_COUNT = 24;
 
 void Cube::computeBounds(){
 
+    glm::vec4 vertices[]{
+        { .5f, .5f, .5f, 1.f }, { .5f, .5f, -.5f, 1.f },
+        { .5f, -.5f, .5f, 1.f }, { .5f, .5f, -.5f, 1.f },
+        { -.5f, .5f, .5f, 1.f }, { -.5f, .5f, -.5f, 1.f },
+        { -.5f, -.5f, .5f, 1.f }, { -.5f, .5f, -.5f, 1.f },
+    };
+
+    glm::vec3 vertices_in_world[ 8 ];
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( int i = 0; i < 8; ++i ){
+        vertices_in_world[ i ] = glm::vec3( transform.T() * vertices[ i ] );
+        max_bound = glm::max( max_bound, vertices_in_world[ i ] );
+        min_bound = glm::min( min_bound, vertices_in_world[ i ] );
+    }
+
+    pBBox = new BoundingBox( max_bound, min_bound );
 }
 
 glm::vec2 Cube::GetUVCoordinates(const glm::vec3 &point){

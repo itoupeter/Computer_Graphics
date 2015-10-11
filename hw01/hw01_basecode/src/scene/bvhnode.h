@@ -13,7 +13,7 @@ public:
     BVHNode *left_child;
     BVHNode *right_child;
 
-    BoundingBox *bbox;
+    BoundingBox *pBBox;
 
     QList< Geometry * > *pGeometries;
 };

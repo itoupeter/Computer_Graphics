@@ -38,6 +38,8 @@ public:
     void create();
     void LoadOBJ(const QStringRef &filename, const QStringRef &local_path);
 
+    //---compute bounding box for triangles---
+
 private:
     QList<Triangle*> faces;
 };
