@@ -16,6 +16,8 @@ public:
     BoundingBox *pBBox;
 
     QList< Geometry * > *pGeometries;
+
+    Intersection getIntersection();
 };
 
 #endif // BVHNODE_H

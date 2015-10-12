@@ -20,6 +20,53 @@ void BoundingBox::setBounds( const glm::vec3 &max_bound, const glm::vec3 &min_bo
     this->center = .5f * ( max_bound + min_bound );
 }
 
+bool BoundingBox::getIntersection( Ray &r ){
+
+    static const float EPS( 1e-4 );
+    float t_near( -1e6f );
+    float t_far( 1e6f );
+    float position[]{
+        min_bound[ 0 ], min_bound[ 1 ], min_bound[ 2 ],
+        max_bound[ 0 ], max_bound[ 1 ], max_bound[ 2 ],
+    };
+
+    for( int i = 0; i < 3; ++i ){
+
+        if( glm::abs( r.direction[ i ] ) < EPS ){
+            if( r.origin[ i ] - EPS < position[ i ] || r.origin[ i ] + EPS > position[ i + 3 ] ){
+                return false;
+            }else{
+                continue;
+            }
+        }
+
+        float t0, t1;
+
+        t0 = ( position[ i ] - r.origin[ i ] ) / r.direction[ i ];
+        t1 = ( position[ i + 3 ] - r.origin[ i ] ) / r.direction[ i ];
+
+        if( t0 + EPS > t1 ){
+            float tmp = t0;
+            t0 = t1;
+            t1 = tmp;
+        }
+
+        if( t0 + EPS > t_near ){
+            t_near = t0;
+        }
+
+        if( t1 - EPS < t_far ){
+            t_far = t1;
+        }
+    }
+
+    if( t_near + EPS > t_far || t_near - EPS < 0.f ){
+        return false;
+    }
+
+    return true;
+}
+
 BoundingBox BoundingBox::combine( const BoundingBox &a, const BoundingBox &b ){
 
     BoundingBox result;
@@ -88,6 +135,10 @@ void BoundingBox::create(){
     std::vector< glm::vec3 > position;
     std::vector< glm::vec3 > color;
     std::vector< GLuint > index;
+
+    position.clear();
+    color.clear();
+    index.clear();
 
     for( int i = 0; i < 8; ++i ){
         position.push_back( positions[ i ] );

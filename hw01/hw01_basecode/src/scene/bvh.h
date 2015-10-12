@@ -8,10 +8,8 @@ class BVH{
 public:
     static Scene *scene;
 
-    static void build( QList< Geometry* >  &geometries, BVHNode* pBVHNode, int depth );
+    static void build( QList< Geometry* >  &geometries, BVHNode* pNode, int depth );
     static void clear( BVHNode * pBVHNode );
 };
-
-Scene *BVH::scene = NULL;
 
 #endif // BVH_H

@@ -12,6 +12,7 @@ Intersection::Intersection():
 IntersectionEngine::IntersectionEngine()
 {
     scene = NULL;
+    root = NULL;
 }
 
 Intersection IntersectionEngine::GetIntersection(Ray r)

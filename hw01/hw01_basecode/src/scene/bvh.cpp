@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <QMessageBox>
 
+Scene *BVH::scene = NULL;
 
 bool compareX( const Geometry *a, const Geometry *b ){
     return a->pBBox->center[ 0 ] < b->pBBox->center[ 0 ];
@@ -27,8 +28,11 @@ void BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
     }
 
     //---current node---
+    pNode = new BVHNode();
     pNode->pGeometries = &geometries;
     pNode->pBBox = new BoundingBox( BoundingBox::combine( geometries ) );
+    pNode->pBBox->create();
+    scene->allBBoxes.push_back( pNode->pBBox );
 
     //---reach leaf node---
     if( geometries.size() == 1 ){
@@ -47,17 +51,25 @@ void BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
     int size( geometries.size() );
     int mid_size( size >> 1 );
 
-    BVHNode *pLeft( pNode->left_child = new BVHNode() );
-    BVHNode *pRight( pNode->right_child = new BVHNode() );
-
-    pLeft->pGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
-    pRight->pGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
-
-    pLeft->pBBox = NULL;
-    pRight->pBBox = NULL;
+    QList< Geometry * > lGeometries( geometries.mid( 0, mid_size ) );
+    QList< Geometry * > rGeometries( geometries.mid( mid_size, size ) );
 
     //---build tree recurrently---
-    build( *pLeft->pGeometries, pLeft, depth + 1 );
-    build( *pRight->pGeometries, pRight, depth + 1 );
+    build( lGeometries, pNode->left_child, depth + 1 );
+    build( rGeometries, pNode->right_child, depth + 1 );
 
+}
+
+void BVH::clear( BVHNode *pNode ){
+
+    //---empty node---
+    if( pNode == NULL ) return;
+
+    //---clear nodes recurrently---
+    clear( pNode->left_child );
+    clear( pNode->right_child );
+
+    //---clear current node---
+    delete pNode->pBBox;
+    delete pNode;
 }

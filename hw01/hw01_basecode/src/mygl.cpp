@@ -107,11 +107,18 @@ void MyGL::GLDrawScene()
             prog_flat.draw(*this, *g);
         }
     }
+
     for(Geometry *l : scene.lights)
     {
         prog_flat.setModelMatrix(l->transform.T());
         prog_flat.draw(*this, *l);
     }
+
+    for( BoundingBox *pBBox : scene.allBBoxes ){
+        prog_flat.setModelMatrix( glm::mat4() );
+        prog_flat.draw( *this, *pBBox );
+    }
+
     prog_flat.setModelMatrix(glm::mat4(1.0f));
     prog_flat.draw(*this, scene.camera);
 }
