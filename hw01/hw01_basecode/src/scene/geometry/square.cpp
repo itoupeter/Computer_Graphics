@@ -24,7 +24,7 @@ void SquarePlane::computeBounds(){
         min_bound = glm::min( min_bound, vertices_in_world[ i ] );
     }
 
-    pBBox = new BoundingBox( max_bound, min_bound );
+    pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( -.1f ) );
 }
 
 glm::vec2 SquarePlane::GetUVCoordinates( const glm::vec3 &point ){

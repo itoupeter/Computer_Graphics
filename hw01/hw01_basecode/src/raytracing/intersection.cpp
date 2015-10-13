@@ -19,6 +19,12 @@ Intersection IntersectionEngine::GetIntersection(Ray r)
 {
     //---Q6---
     //TODO
+
+#define USE_BVH
+#ifdef USE_BVH
+    //---use BVH---
+    return root->getIntersection( r );
+#else
     float min_t = 1e6;
     Intersection intersection, result;
 
@@ -34,4 +40,6 @@ Intersection IntersectionEngine::GetIntersection(Ray r)
     }
 
     return result;
+#endif
+
 }

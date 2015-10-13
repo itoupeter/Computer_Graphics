@@ -212,9 +212,10 @@ void MyGL::SceneLoadDialog()
     intersection_engine.scene = &scene;
 
     //---
+    scene.allBBoxes.clear();
     BVH::scene = &scene;
     BVH::clear( intersection_engine.root );
-    BVH::build( scene.objects, intersection_engine.root, 0 );
+    intersection_engine.root = BVH::build( scene.objects, intersection_engine.root, 0 );
     //---
 }
 

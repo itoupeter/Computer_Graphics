@@ -12,6 +12,7 @@ public:
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
     virtual void computeBounds();
+    void computeBounds( const glm::mat4 &t );
 
     glm::vec3 points[3];
     glm::vec3 normals[3];
@@ -31,6 +32,8 @@ public:
 class Mesh : public Geometry
 {
 public:
+    Mesh();
+
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
     virtual void computeBounds();
@@ -39,7 +42,9 @@ public:
     void LoadOBJ(const QStringRef &filename, const QStringRef &local_path);
 
     //---compute bounding box for triangles---
+    BVHNode *root;
 
 private:
     QList<Triangle*> faces;
+    QList< Geometry * > gFaces;
 };

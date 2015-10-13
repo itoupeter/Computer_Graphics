@@ -116,8 +116,12 @@ Intersection Cube::GetIntersection(Ray r)
         }
     }
 
-    if( t_near + EPS > t_far || t_near - EPS < 0.f ){
+    if( t_near + EPS > t_far || t_far - EPS < 0.f ){
         return Intersection();
+    }
+
+    if( t_near - EPS < 0.f ){
+        t_near = t_far;
     }
 
     int hit_face = -1;
@@ -172,6 +176,7 @@ Intersection Cube::GetIntersection(Ray r)
         result.normal = glm::vec3( 0, 0, 1 );
         break;
     }
+
     result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) ) );
     result.t = glm::distance( result.point, rInWorld.origin );
     result.object_hit = this;

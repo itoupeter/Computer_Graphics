@@ -3,21 +3,23 @@
 
 #include "scene/boundingbox.h"
 #include "scene/geometry/geometry.h"
+#include "raytracing/intersection.h"
 
 class BoundingBox;
+class Intersection;
 
 class BVHNode{
 public:
     BVHNode();
 
-    BVHNode *left_child;
-    BVHNode *right_child;
+    BVHNode *pLeft;
+    BVHNode *pRight;
 
     BoundingBox *pBBox;
 
-    QList< Geometry * > *pGeometries;
+    Geometry *pGeometry;
 
-    Intersection getIntersection();
+    Intersection getIntersection( const Ray &r );
 };
 
 #endif // BVHNODE_H

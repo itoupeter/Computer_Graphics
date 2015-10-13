@@ -131,7 +131,6 @@ void createSphereVertexNormals(glm::vec3 (&sph_vert_nor)[SPH_VERT_COUNT])
     sph_vert_nor[381] = glm::vec3(0, -1.0f, 0);
 }
 
-
 void createSphereIndices(GLuint (&sph_idx)[SPH_IDX_COUNT])
 {
     int index = 0;

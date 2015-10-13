@@ -20,20 +20,16 @@ void BoundingBox::setBounds( const glm::vec3 &max_bound, const glm::vec3 &min_bo
     this->center = .5f * ( max_bound + min_bound );
 }
 
-bool BoundingBox::getIntersection( Ray &r ){
+bool BoundingBox::getIntersection( const Ray &r ){
 
     static const float EPS( 1e-4 );
     float t_near( -1e6f );
     float t_far( 1e6f );
-    float position[]{
-        min_bound[ 0 ], min_bound[ 1 ], min_bound[ 2 ],
-        max_bound[ 0 ], max_bound[ 1 ], max_bound[ 2 ],
-    };
 
     for( int i = 0; i < 3; ++i ){
 
         if( glm::abs( r.direction[ i ] ) < EPS ){
-            if( r.origin[ i ] - EPS < position[ i ] || r.origin[ i ] + EPS > position[ i + 3 ] ){
+            if( r.origin[ i ] - EPS < min_bound[ i ] || r.origin[ i ] + EPS > max_bound[ i ] ){
                 return false;
             }else{
                 continue;
@@ -42,8 +38,8 @@ bool BoundingBox::getIntersection( Ray &r ){
 
         float t0, t1;
 
-        t0 = ( position[ i ] - r.origin[ i ] ) / r.direction[ i ];
-        t1 = ( position[ i + 3 ] - r.origin[ i ] ) / r.direction[ i ];
+        t0 = ( min_bound[ i ] - r.origin[ i ] ) / r.direction[ i ];
+        t1 = ( max_bound[ i ] - r.origin[ i ] ) / r.direction[ i ];
 
         if( t0 + EPS > t1 ){
             float tmp = t0;
@@ -60,7 +56,7 @@ bool BoundingBox::getIntersection( Ray &r ){
         }
     }
 
-    if( t_near + EPS > t_far || t_near - EPS < 0.f ){
+    if( t_near + EPS > t_far || t_far - EPS < 0.f ){
         return false;
     }
 

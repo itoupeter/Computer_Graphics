@@ -17,26 +17,26 @@ bool compareZ( const Geometry *a, const Geometry *b ){
     return a->pBBox->center[ 2 ] < b->pBBox->center[ 2 ];
 }
 
-void BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
+BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
 
     //---no geometry---
     if( geometries.size() == 0 ){
         QMessageBox msg;
         msg.setText( "No geometry in the scene." );
         msg.exec();
-        return;
+        return pNode;
     }
 
     //---current node---
     pNode = new BVHNode();
-    pNode->pGeometries = &geometries;
     pNode->pBBox = new BoundingBox( BoundingBox::combine( geometries ) );
     pNode->pBBox->create();
     scene->allBBoxes.push_back( pNode->pBBox );
 
     //---reach leaf node---
     if( geometries.size() == 1 ){
-        return;
+        pNode->pGeometry = geometries.front();
+        return pNode;
     }
 
     //---sort geometries according to X/Y/Z axis---
@@ -51,13 +51,14 @@ void BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
     int size( geometries.size() );
     int mid_size( size >> 1 );
 
-    QList< Geometry * > lGeometries( geometries.mid( 0, mid_size ) );
-    QList< Geometry * > rGeometries( geometries.mid( mid_size, size ) );
+    QList< Geometry * > *lGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
+    QList< Geometry * > *rGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
 
     //---build tree recurrently---
-    build( lGeometries, pNode->left_child, depth + 1 );
-    build( rGeometries, pNode->right_child, depth + 1 );
+    pNode->pLeft = build( *lGeometries, pNode->pLeft, depth + 1 );
+    pNode->pRight = build( *rGeometries, pNode->pRight, depth + 1 );
 
+    return pNode;
 }
 
 void BVH::clear( BVHNode *pNode ){
@@ -66,8 +67,8 @@ void BVH::clear( BVHNode *pNode ){
     if( pNode == NULL ) return;
 
     //---clear nodes recurrently---
-    clear( pNode->left_child );
-    clear( pNode->right_child );
+    clear( pNode->pLeft );
+    clear( pNode->pRight );
 
     //---clear current node---
     delete pNode->pBBox;

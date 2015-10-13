@@ -2,8 +2,32 @@
 #include <la.h>
 #include <tinyobj/tiny_obj_loader.h>
 #include <iostream>
+#include "scene/bvh.h"
 
 void Triangle::computeBounds(){
+
+}
+
+void Triangle::computeBounds( const glm::mat4 &t ){
+
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    //---transform vertices to the world space---
+    glm::vec4 vertices_in_world[]{
+        t * glm::vec4( points[ 0 ], 1.f ),
+        t * glm::vec4( points[ 1 ], 1.f ),
+        t * glm::vec4( points[ 2 ], 1.f ),
+    };
+
+    //---decide bounds---
+    for( int i = 0; i < 3; ++i ){
+        max_bound = glm::max( max_bound, glm::vec3( vertices_in_world[ i ] ) );
+        min_bound = glm::min( min_bound, glm::vec3( vertices_in_world[ i ] ) );
+    }
+
+    pBBox = new BoundingBox( max_bound, min_bound );
+
 }
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3):
@@ -109,6 +133,10 @@ Intersection Triangle::GetIntersection(Ray r)
     return result;
 }
 
+Mesh::Mesh():
+    root( NULL ){
+}
+
 void Mesh::computeBounds(){
 
     glm::vec3 max_bound( -1e6f );
@@ -130,11 +158,11 @@ void Mesh::computeBounds(){
         }
     }
 
-    pBBox = new BoundingBox( max_bound, min_bound );
+    pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( .1f ) );
 }
 
 glm::vec2 Mesh::GetUVCoordinates( const glm::vec3 &point ){
-    return glm::vec2( 0.f, 0.f );
+    return glm::vec2( 0.f );
 }
 
 Intersection Mesh::GetIntersection(Ray r)
@@ -147,6 +175,10 @@ Intersection Mesh::GetIntersection(Ray r)
 
     r = r.GetTransformedCopy( transform.invT() );
 
+//#define USE_BVH
+#ifdef USE_BVH
+    result = root->getIntersection( r );
+#else
     for( QList<Triangle*>::iterator i = faces.begin(); i != faces.end(); ++i ){
 
         Intersection intersection( ( *i )->GetIntersection( r ) );
@@ -165,6 +197,7 @@ Intersection Mesh::GetIntersection(Ray r)
     result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) ) );
     result.t = glm::length( result.point - rInWorld.origin );
     result.object_hit = this;
+#endif
 
     return result;
 }
@@ -229,6 +262,16 @@ void Mesh::LoadOBJ(const QStringRef &filename, const QStringRef &local_path)
         //An error loading the OBJ occurred!
         std::cout << errors << std::endl;
     }
+
+#ifdef USE_BVH
+    //---build BVH---
+    for( Triangle *triangle : faces ){
+        triangle->computeBounds( transform.T() );
+        gFaces.push_back( static_cast< Geometry * >( triangle ) );
+    }
+    BVH::clear( root );
+    root = BVH::build( gFaces, root, 0 );
+#endif
 }
 
 void Mesh::create(){
