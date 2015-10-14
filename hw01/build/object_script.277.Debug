@@ -28,6 +28,7 @@ INPUT(
 ./debug\boundingbox.o
 ./debug\bvh.o
 ./debug\bvhnode.o
+./debug\randompixelsampler.o
 ./debug\qrc_glsl.o
 ./debug\moc_mainwindow.o
 ./debug\moc_mygl.o

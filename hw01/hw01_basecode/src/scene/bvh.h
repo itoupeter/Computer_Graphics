@@ -9,6 +9,7 @@ public:
     static Scene *scene;
 
     static BVHNode *build( QList< Geometry* >  &geometries, BVHNode* pNode, int depth );
+    static BVHNode *mesh_build( QList< Geometry * > &geometries, BVHNode *pNode, int depth );
     static void clear( BVHNode * pBVHNode );
 };
 

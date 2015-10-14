@@ -112,10 +112,11 @@ glm::vec3 Integrator::TraceRay(Ray r, unsigned int depth)
         if( isReflected && pMaterial->reflectivity > EPS ){
             glm::vec3 new_ray_o( isx_origin_out );
             glm::vec3 new_ray_d( glm::reflect( r.direction, isx.normal ) );
+            Ray new_ray( new_ray_o, new_ray_d );
 
             result += pMaterial->reflectivity
                     * isx.color
-                    * TraceRay( Ray( new_ray_o, new_ray_d ), depth + 1 );
+                    * TraceRay( new_ray, depth + 1 );
         }
 
     }

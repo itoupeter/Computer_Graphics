@@ -6,9 +6,19 @@
 
 void Triangle::computeBounds(){
 
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( int i = 0; i < 3; ++i ){
+        max_bound = glm::max( max_bound, points[ i ] );
+        min_bound = glm::max( min_bound, points[ i ] );
+    }
+
+    pBBoxInLocal = new BoundingBox( max_bound, min_bound );
+
 }
 
-void Triangle::computeBounds( const glm::mat4 &t ){
+void Triangle::computeBoundsInWorld( const glm::mat4 &t ){
 
     glm::vec3 max_bound( -1e6f );
     glm::vec3 min_bound( 1e6f );
@@ -128,10 +138,13 @@ Intersection Triangle::GetIntersection(Ray r)
     result.point = r.origin + t * r.direction;
     result.t = t;
     result.object_hit = this;
-    result.color = material->GetImageColor( GetUVCoordinates( result.point ), material->texture ) * material->base_color;
+    result.color = material->GetImageColor( GetUVCoordinates( result.point ), material->texture )
+            * material->base_color;
 
     return result;
 }
+
+QList< BoundingBox * > Mesh::allBBoxes;
 
 Mesh::Mesh():
     root( NULL ){
@@ -175,7 +188,7 @@ Intersection Mesh::GetIntersection(Ray r)
 
     r = r.GetTransformedCopy( transform.invT() );
 
-//#define USE_BVH
+#define USE_BVH
 #ifdef USE_BVH
     result = root->getIntersection( r );
 #else
@@ -263,12 +276,14 @@ void Mesh::LoadOBJ(const QStringRef &filename, const QStringRef &local_path)
         std::cout << errors << std::endl;
     }
 
+    //---BVH for mesh---
 #ifdef USE_BVH
-    //---build BVH---
     for( Triangle *triangle : faces ){
-        triangle->computeBounds( transform.T() );
         gFaces.push_back( static_cast< Geometry * >( triangle ) );
+        triangle->computeBounds();
+        triangle->computeBoundsInWorld( transform.T() );
     }
+    Mesh::allBBoxes.clear();
     BVH::clear( root );
     root = BVH::build( gFaces, root, 0 );
 #endif

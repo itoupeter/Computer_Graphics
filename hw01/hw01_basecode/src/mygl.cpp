@@ -8,6 +8,10 @@
 #include <QFileDialog>
 #include <tbb/tbb.h>
 #include "scene/bvh.h"
+#include "raytracing/samplers/randompixelsampler.h"
+#include "raytracing/samplers/stratifiedpixelsampler.h"
+#include "raytracing/samplers/uniformpixelsampler.h"
+#include "scene/geometry/mesh.h"
 
 using namespace tbb;
 
@@ -94,6 +98,7 @@ void MyGL::paintGL()
 
 void MyGL::GLDrawScene()
 {
+    //---draw scene geometries---
     for(Geometry *g : scene.objects)
     {
         if(g->drawMode() == GL_TRIANGLES)
@@ -108,17 +113,26 @@ void MyGL::GLDrawScene()
         }
     }
 
+    //---draw scene lights---
     for(Geometry *l : scene.lights)
     {
         prog_flat.setModelMatrix(l->transform.T());
         prog_flat.draw(*this, *l);
     }
 
+    //---draw bounding box for scene geometries---
     for( BoundingBox *pBBox : scene.allBBoxes ){
         prog_flat.setModelMatrix( glm::mat4() );
         prog_flat.draw( *this, *pBBox );
     }
 
+    //---draw bounding box for mesh triangles---
+    for( boundingBox *pBBox : Mesh::allBBoxes ){
+        prog_flat.setModelMatrix( glm::mat4() );
+        prog_flat.draw( *this, *pBBox );
+    }
+
+    //---draw frustum lines and axis---
     prog_flat.setModelMatrix(glm::mat4(1.0f));
     prog_flat.draw(*this, scene.camera);
 }
@@ -226,6 +240,7 @@ void MyGL::RaytraceScene()
     {
         return;
     }
+
     #define TBB //Uncomment this line out to render your scene with multiple threads.
     //This is useful when debugging your raytracer with breakpoints.
     #ifdef TBB
@@ -235,14 +250,42 @@ void MyGL::RaytraceScene()
             {
                 ///---Q7---
                 //TODO
-                Ray ray( gl_camera.Raycast( i, j ) );
-                Intersection intersection( intersection_engine.GetIntersection( ray ) );
+                QList< glm::vec2 > samples;
+                const int nSamples( 1 );
 
-                if( intersection.object_hit == NULL ){
-                    scene.film.pixels[ i ][ j ] = glm::vec3( 0.f, 0.f, 0.f );
-                }else{
-                    scene.film.pixels[ i ][ j ] = integrator.TraceRay( ray, 0 );
+//#define UNIFORM_AA
+#ifndef UNIFORM_AA
+//  #define STRATIFIED_AA
+    #ifndef STRATIFIED_AA
+      #define RANDOM_AA
+    #endif
+#endif
+
+#ifdef UNIFORM_AA
+                UniformPixelSampler sampler( nSamples );
+#endif
+#ifdef STRATIFIED_AA
+                StratifiedPixelSampler sampler( nSamples );
+#endif
+#ifdef RANDOM_AA
+                RandomPixelSampler sampler( nSamples );
+#endif
+
+                samples.clear();
+                samples = sampler.GetSamples( i, j );
+
+                for( const glm::vec2 &v2 : samples ){
+
+                    Ray ray( gl_camera.Raycast( v2.x, v2.y ) );
+                    Intersection intersection( intersection_engine.GetIntersection( ray ) );
+
+                    if( intersection.object_hit == NULL ){
+                        scene.film.pixels[ i ][ j ] += glm::vec3( 0.f, 0.f, 0.f );
+                    }else{
+                        scene.film.pixels[ i ][ j ] += integrator.TraceRay( ray, 0 );
+                    }
                 }
+                scene.film.pixels[ i ][ j ] /= nSamples * nSamples;
             }
         });
     #else

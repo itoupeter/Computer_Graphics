@@ -17,6 +17,7 @@ public:
 
     static BoundingBox combine( const BoundingBox &a, const BoundingBox &b );
     static BoundingBox combine( const QList< Geometry * > &geometries );
+    static BoundingBox mesh_combine( const QList< Geometry * > &geometries );
 
     glm::vec3 max_bound;
     glm::vec3 min_bound;

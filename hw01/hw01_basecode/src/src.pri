@@ -31,7 +31,8 @@ SOURCES += \
     $$PWD/scene/materials/lambertmaterial.cpp \
     $$PWD/scene/boundingbox.cpp \
     $$PWD/scene/bvh.cpp \
-    $$PWD/scene/bvhnode.cpp
+    $$PWD/scene/bvhnode.cpp \
+    $$PWD/raytracing/samplers/randompixelsampler.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -69,4 +70,5 @@ HEADERS += \
     $$PWD/scene/boundingbox.h \
     $$PWD/scene/bvhnode.h \
     $$PWD/scene/materials/bvh.h \
-    $$PWD/scene/bvh.h
+    $$PWD/scene/bvh.h \
+    $$PWD/raytracing/samplers/randompixelsampler.h

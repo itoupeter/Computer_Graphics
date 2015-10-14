@@ -1,5 +1,6 @@
 
 #include "scene/bvh.h"
+#include "scene/geometry/mesh.h"
 #include <algorithm>
 #include <QMessageBox>
 
@@ -61,12 +62,59 @@ BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth 
     return pNode;
 }
 
+BVHNode *BVH::mesh_build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
+
+    //---no geometry---
+    if( geometries.size() == 0 ){
+        QMessageBox msg;
+        msg.setText( "No triangle in the mesh." );
+        msg.exec();
+        return pNode;
+    }
+
+    //---current node---
+    pNode = new BVHNode();
+    //---bounding box for intersection testing---
+    pNode->pBBox = new BoundingBox( BoundingBox::combine( geometries ) );
+    //---bounding box for visualizing---
+    BoundingBox *pBBoxR( new BoundingBox( BoundingBox::mesh_combine( geometries ) ) );
+    pBBoxR->create();
+    Mesh::allBBoxes.push_back( pBBoxR );
+
+    //---reach leaf node---
+    if( geometries.size() == 1 ){
+        pNode->pGeometry = geometries.front();
+        return pNode;
+    }
+
+    //---sort geometries according to X/Y/Z axis---
+    typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
+    static CompareFunc compareFunc[]{
+        compareX, compareY, compareZ,
+    };
+
+    std::sort( geometries.begin(), geometries.end(), compareFunc[ depth % 3 ] );
+
+    //---split into children nodes---
+    int size( geometries.size() );
+    int mid_size( size >> 1 );
+
+    QList< Geometry * > *lGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
+    QList< Geometry * > *rGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
+
+    //---build tree recurrently---
+    pNode->pLeft = build( *lGeometries, pNode->pLeft, depth + 1 );
+    pNode->pRight = build( *rGeometries, pNode->pRight, depth + 1 );
+
+    return pNode;
+}
+
 void BVH::clear( BVHNode *pNode ){
 
     //---empty node---
     if( pNode == NULL ) return;
 
-    //---clear nodes recurrently---
+    //---clear tree nodes recurrently---
     clear( pNode->pLeft );
     clear( pNode->pRight );
 

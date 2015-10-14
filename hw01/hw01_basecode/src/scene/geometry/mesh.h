@@ -11,13 +11,16 @@ public:
     Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3, const glm::vec2 &t1, const glm::vec2 &t2, const glm::vec2 &t3);
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
-    virtual void computeBounds();
-    void computeBounds( const glm::mat4 &t );
+    void computeBoundsInWorld( const glm::mat4 &t );
 
     glm::vec3 points[3];
     glm::vec3 normals[3];
     glm::vec2 uvs[3];
     glm::vec3 plane_normal;
+
+    //---bounding box in local---
+    BoundingBox *pBBoxInLocal;
+    virtual void computeBounds();
 
     void create();//This does nothing because individual triangles are not rendered with OpenGL;
                             //they are rendered all together in their Mesh.
@@ -43,6 +46,9 @@ public:
 
     //---compute bounding box for triangles---
     BVHNode *root;
+
+    //---for render bounding box---
+    static QList< BoundingBox * > allBBoxes;
 
 private:
     QList<Triangle*> faces;
