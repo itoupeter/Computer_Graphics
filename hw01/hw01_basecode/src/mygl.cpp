@@ -246,8 +246,6 @@ void MyGL::RaytraceScene()
     timer.start();
 
     //---samples---
-    QList< glm::vec2 > samples;
-    const int nSamples( 4 );
 
     #define TBB //Uncomment this line out to render your scene with multiple threads.
     //This is useful when debugging your raytracer with breakpoints.
@@ -258,8 +256,10 @@ void MyGL::RaytraceScene()
             {
                 ///---Q7---
                 //TODO
+                QList< glm::vec2 > samples;
+                const int nSamples( 4 );
 
-//#define UNIFORM_AA
+#define UNIFORM_AA
 #ifndef UNIFORM_AA
 //  #define STRATIFIED_AA
     #ifndef STRATIFIED_AA

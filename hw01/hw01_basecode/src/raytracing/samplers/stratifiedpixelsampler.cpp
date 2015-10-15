@@ -16,7 +16,7 @@ QList<glm::vec2> StratifiedPixelSampler::GetSamples(int x, int y)
 
     for( int i = 0; i < samples_sqrt; ++i ){
         for( int j = 0; j < samples_sqrt; ++j ){
-            result.push_back( glm::vec2( a + c * i + distribution( generator ), b + c * i + distribution( generator ) ) );
+            result.push_back( glm::vec2( a + c * i + c * distribution( generator ), b + c * i + c * distribution( generator ) ) );
         }
     }
 
