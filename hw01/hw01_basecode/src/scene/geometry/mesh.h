@@ -11,6 +11,8 @@ public:
     Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3, const glm::vec2 &t1, const glm::vec2 &t2, const glm::vec2 &t3);
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );
+    //---bounding box in world space---
+    //---pBBox in Geometry---
     void computeBoundsInWorld( const glm::mat4 &t );
 
     glm::vec3 points[3];
@@ -18,7 +20,7 @@ public:
     glm::vec2 uvs[3];
     glm::vec3 plane_normal;
 
-    //---bounding box in local---
+    //---bounding box in local space---
     BoundingBox *pBBoxInLocal;
     virtual void computeBounds();
 
@@ -36,6 +38,7 @@ class Mesh : public Geometry
 {
 public:
     Mesh();
+    ~Mesh();
 
     Intersection GetIntersection(Ray r);
     virtual glm::vec2 GetUVCoordinates( const glm::vec3 &point );

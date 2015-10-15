@@ -9,9 +9,10 @@ void Triangle::computeBounds(){
     glm::vec3 max_bound( -1e6f );
     glm::vec3 min_bound( 1e6f );
 
+    //---decide bounds---
     for( int i = 0; i < 3; ++i ){
         max_bound = glm::max( max_bound, points[ i ] );
-        min_bound = glm::max( min_bound, points[ i ] );
+        min_bound = glm::min( min_bound, points[ i ] );
     }
 
     pBBoxInLocal = new BoundingBox( max_bound, min_bound );
@@ -150,6 +151,10 @@ Mesh::Mesh():
     root( NULL ){
 }
 
+Mesh::~Mesh(){
+    BVH::clear( root );
+}
+
 void Mesh::computeBounds(){
 
     glm::vec3 max_bound( -1e6f );
@@ -165,13 +170,36 @@ void Mesh::computeBounds(){
         };
 
         //---decide bounds---
+        glm::vec3 max_bound_tri_w( -1e6f );
+        glm::vec3 min_bound_tri_w( 1e6f );
+        glm::vec3 max_bound_tri_l( -1e6f );
+        glm::vec3 min_bound_tri_l( 1e6f );
+
         for( int i = 0; i < 3; ++i ){
-            max_bound = glm::max( max_bound, glm::vec3( vertices_in_world[ i ] ) );
-            min_bound = glm::min( min_bound, glm::vec3( vertices_in_world[ i ] ) );
+            max_bound_tri_w = glm::max( max_bound_tri_w, glm::vec3( vertices_in_world[ i ] ) );
+            min_bound_tri_w = glm::min( min_bound_tri_w, glm::vec3( vertices_in_world[ i ] ) );
+            max_bound_tri_l = glm::max( max_bound_tri_l, glm::vec3( triangle->points[ i ] ) );
+            min_bound_tri_l = glm::min( min_bound_tri_l, glm::vec3( triangle->points[ i ] ) );
         }
+
+        //---cast Triangle* to Geometry* and save to pFaces---
+        gFaces.push_back( static_cast< Geometry * >( triangle ) );
+
+        //---save bounding box of current triangle in world space---
+        triangle->pBBox = new BoundingBox( max_bound_tri_w, min_bound_tri_w );
+
+        //---save bounding box of current triangle in mesh space---
+        triangle->pBBoxInLocal = new BoundingBox( max_bound_tri_l, min_bound_tri_l );
+
+        //---calculate mesh bounding box in world space---
+        max_bound = glm::max( max_bound, max_bound_tri_w );
+        min_bound = glm::min( min_bound, min_bound_tri_w );
     }
 
     pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( .1f ) );
+
+    //---build BVH for mesh---
+    root = BVH::mesh_build( gFaces, root, 0 );
 }
 
 glm::vec2 Mesh::GetUVCoordinates( const glm::vec3 &point ){
@@ -183,9 +211,10 @@ Intersection Mesh::GetIntersection(Ray r)
     //---Q5---
     //TODO
     Intersection result;
-    float min_t = 1e6;
-    Ray rInWorld = r;
+    Ray rInWorld( r );
+    float min_t( 1e6 );
 
+    //---ray in mesh space---
     r = r.GetTransformedCopy( transform.invT() );
 
 #define USE_BVH
@@ -203,6 +232,7 @@ Intersection Mesh::GetIntersection(Ray r)
         }
 
     }
+#endif
 
     if( result.object_hit == NULL ) return result;
 
@@ -210,7 +240,6 @@ Intersection Mesh::GetIntersection(Ray r)
     result.normal = glm::normalize( glm::vec3( transform.invTransT() * glm::vec4( result.normal, 0.f ) ) );
     result.t = glm::length( result.point - rInWorld.origin );
     result.object_hit = this;
-#endif
 
     return result;
 }
@@ -275,18 +304,6 @@ void Mesh::LoadOBJ(const QStringRef &filename, const QStringRef &local_path)
         //An error loading the OBJ occurred!
         std::cout << errors << std::endl;
     }
-
-    //---BVH for mesh---
-#ifdef USE_BVH
-    for( Triangle *triangle : faces ){
-        gFaces.push_back( static_cast< Geometry * >( triangle ) );
-        triangle->computeBounds();
-        triangle->computeBoundsInWorld( transform.T() );
-    }
-    Mesh::allBBoxes.clear();
-    BVH::clear( root );
-    root = BVH::build( gFaces, root, 0 );
-#endif
 }
 
 void Mesh::create(){

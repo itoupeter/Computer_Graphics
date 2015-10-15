@@ -7,6 +7,7 @@
 #include <QXmlStreamReader>
 #include <QFileDialog>
 #include <tbb/tbb.h>
+#include <QElapsedTimer>
 #include "scene/bvh.h"
 #include "raytracing/samplers/randompixelsampler.h"
 #include "raytracing/samplers/stratifiedpixelsampler.h"
@@ -127,7 +128,7 @@ void MyGL::GLDrawScene()
     }
 
     //---draw bounding box for mesh triangles---
-    for( boundingBox *pBBox : Mesh::allBBoxes ){
+    for( BoundingBox *pBBox : Mesh::allBBoxes ){
         prog_flat.setModelMatrix( glm::mat4() );
         prog_flat.draw( *this, *pBBox );
     }
@@ -226,7 +227,6 @@ void MyGL::SceneLoadDialog()
     intersection_engine.scene = &scene;
 
     //---
-    scene.allBBoxes.clear();
     BVH::scene = &scene;
     BVH::clear( intersection_engine.root );
     intersection_engine.root = BVH::build( scene.objects, intersection_engine.root, 0 );
@@ -241,6 +241,14 @@ void MyGL::RaytraceScene()
         return;
     }
 
+    //---timer---
+    QElapsedTimer timer;
+    timer.start();
+
+    //---samples---
+    QList< glm::vec2 > samples;
+    const int nSamples( 4 );
+
     #define TBB //Uncomment this line out to render your scene with multiple threads.
     //This is useful when debugging your raytracer with breakpoints.
     #ifdef TBB
@@ -250,8 +258,6 @@ void MyGL::RaytraceScene()
             {
                 ///---Q7---
                 //TODO
-                QList< glm::vec2 > samples;
-                const int nSamples( 1 );
 
 //#define UNIFORM_AA
 #ifndef UNIFORM_AA
@@ -307,6 +313,12 @@ void MyGL::RaytraceScene()
         }
 
     #endif
-    std::cout << "OK" << std::endl;
+
+    std::cout << "\n"
+            << "Scene: wahoo.xml\n"
+            << "Anti-Aliasing: random 4x4\n"
+            << "BVH Acceleration: yes\n"
+            << "Time Elapsed: " << timer.elapsed() << " ms\n";
+
     scene.film.WriteImage(filepath);
 }

@@ -64,4 +64,9 @@ void Scene::Clear()
     film = Film();
     delete pixel_sampler;
     pixel_sampler = new UniformPixelSampler();
+
+   //---
+    Mesh::allBBoxes.clear();
+    Scene::allBBoxes.clear();
+   //---
 }

@@ -74,38 +74,35 @@ BoundingBox BoundingBox::combine( const BoundingBox &a, const BoundingBox &b ){
     return result;
 }
 
-BoundingBox BoundingBox::mesh_combine( const QList< Geometry * > &geometries ){
+//---mesh space---
+BoundingBox BoundingBox::combine( const QList< Geometry * > &geometries ){
 
     glm::vec3 max( -1e6f );
     glm::vec3 min( 1e6f );
 
-    for( Triangle *triangle : geometries ){
-        max = glm::max( max, triangle->pBBox->max_bound );
-        min = glm::min( min, triangle->pBBox->min_bound );
-    }
-
-    BoundingBox result;
-
-    result.setBounds( max, min );
-
-    return result;
-}
-
-BoundingBox BoundingBox::mesh_combine( const QList< Geometry * > &geometries ){
-
-    glm::vec3 max( -1e6f );
-    glm::vec3 min( 1e6f );
-
-    for( Geometry *triangle : geometries ){
+    for( Geometry *geometry : geometries ){
         max = glm::max( max, geometry->pBBox->max_bound );
         min = glm::min( min, geometry->pBBox->min_bound );
     }
 
-    BoundingBox result;
+    return BoundingBox( max, min );
+}
 
-    result.setBounds( max, min );
+//---world space---
+BoundingBox BoundingBox::mesh_combine( const QList< Geometry * > &geometries ){
 
-    return result;
+    glm::vec3 max( -1e6f );
+    glm::vec3 min( 1e6f );
+
+    for( Geometry *geometry : geometries ){
+
+        Triangle *triangle( static_cast< Triangle * >( geometry ) );
+
+        max = glm::max( max, triangle->pBBoxInLocal->max_bound );
+        min = glm::min( min, triangle->pBBoxInLocal->min_bound );
+    }
+
+    return BoundingBox( max, min );
 }
 
 //---UI---
