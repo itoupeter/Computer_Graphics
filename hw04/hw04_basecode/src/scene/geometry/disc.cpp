@@ -6,6 +6,22 @@ void Disc::ComputeArea()
     area = 0;
 }
 
+Intersection Disc::SampleLight( float a, float b ){
+
+    float sqrt_r( sqrt( a ) );
+    float theta( b * TWO_PI );
+
+    float x( sqrt_r * cos( theta ) );
+    float y( sqrt_r * sin( theta ) );
+
+    glm::vec3 o( x, y, 1.f );
+    glm::vec3 d( 0.f, 0.f, -1.f );
+
+    Ray r( o_world, d_world );
+
+    return GetIntersection( r.GetTransformedCopy( transform.T() ) );
+}
+
 Intersection Disc::GetIntersection(Ray r)
 {
     //Transform the ray

@@ -11,5 +11,7 @@ public:
     virtual glm::vec3 ComputeNormal(const glm::vec3 &P);
     void create();
 
+    Intersection getSample( float a, float b );
+
     virtual void ComputeArea();
 };

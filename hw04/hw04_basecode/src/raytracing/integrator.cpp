@@ -17,3 +17,9 @@ void Integrator::SetDepth(unsigned int depth)
 {
     max_depth = depth;
 }
+
+glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
+
+    return glm::vec3( 0.f );
+
+}

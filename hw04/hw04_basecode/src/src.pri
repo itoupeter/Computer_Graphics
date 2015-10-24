@@ -32,7 +32,8 @@ SOURCES += \
     $$PWD/scene/materials/bxdfs/bxdf.cpp \
     $$PWD/scene/materials/lightmaterial.cpp \
     $$PWD/renderthread.cpp \
-    $$PWD/scene/geometry/geometry.cpp
+    $$PWD/scene/geometry/geometry.cpp \
+    $$PWD/raytracing/directlightingintegrator.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -70,4 +71,5 @@ HEADERS += \
     $$PWD/scene/materials/bxdfs/bxdf.h \
     $$PWD/scene/materials/lightmaterial.h \
     $$PWD/renderthread.h \
-    $$PWD/raytracing/intersectionengine.h
+    $$PWD/raytracing/intersectionengine.h \
+    $$PWD/raytracing/directlightingintegrator.h

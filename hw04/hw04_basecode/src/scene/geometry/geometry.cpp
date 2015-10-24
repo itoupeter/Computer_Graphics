@@ -11,3 +11,8 @@ float Geometry::RayPDF(const Intersection &isx, const Ray &ray)
     }
     //Add more here
 }
+
+Intersection Geometry::SampleLight( float a, float b ){
+
+    return Intersection();
+}

@@ -21,6 +21,7 @@ public:
     }
 //Functions
     virtual ~Geometry(){}
+    virtual Intersection SampleLight( float a, float b );
     virtual Intersection GetIntersection(Ray r) = 0;
     virtual void SetMaterial(Material* m){material = m;}
     virtual glm::vec2 GetUVCoordinates(const glm::vec3 &point) = 0;
