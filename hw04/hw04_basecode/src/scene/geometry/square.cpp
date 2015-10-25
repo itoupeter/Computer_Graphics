@@ -3,7 +3,24 @@
 void SquarePlane::ComputeArea()
 {
     //TODO
-    area = 0;
+    glm::mat4 t( transform.T() );
+
+    float sx = glm::length( glm::vec3( t[ 0 ][ 0 ], t[ 1 ][ 0 ], t[ 2 ][ 0 ] ) );
+    float sy = glm::length( glm::vec3( t[ 0 ][ 1 ], t[ 1 ][ 1 ], t[ 2 ][ 1 ] ) );
+    float sz = glm::length( glm::vec3( t[ 0 ][ 2 ], t[ 1 ][ 2 ], t[ 2 ][ 2 ] ) );
+
+    area = sx * sy * sz;
+}
+
+Intersection SquarePlane::SampleLight( float a, float b ){
+
+    glm::vec3 o( a, b, 1.f );
+    glm::vec3 d( 0.f, 0.f, -1.f );
+
+    Ray r( o, d );
+
+    return GetIntersection( r.GetTransformedCopy( transform.T() ) );
+
 }
 
 Intersection SquarePlane::GetIntersection(Ray r)

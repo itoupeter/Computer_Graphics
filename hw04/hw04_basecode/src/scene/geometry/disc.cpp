@@ -3,7 +3,13 @@
 void Disc::ComputeArea()
 {
     //TODO
-    area = 0;
+    glm::mat4 t( transform.T() );
+
+    float sx = glm::length( glm::vec3( t[ 0 ][ 0 ], t[ 1 ][ 0 ], t[ 2 ][ 0 ] ) );
+    float sy = glm::length( glm::vec3( t[ 0 ][ 1 ], t[ 1 ][ 1 ], t[ 2 ][ 1 ] ) );
+    float sz = glm::length( glm::vec3( t[ 0 ][ 2 ], t[ 1 ][ 2 ], t[ 2 ][ 2 ] ) );
+
+    area = .25f * PI * sx * sy * sz;
 }
 
 Intersection Disc::SampleLight( float a, float b ){
@@ -17,7 +23,7 @@ Intersection Disc::SampleLight( float a, float b ){
     glm::vec3 o( x, y, 1.f );
     glm::vec3 d( 0.f, 0.f, -1.f );
 
-    Ray r( o_world, d_world );
+    Ray r( o, d );
 
     return GetIntersection( r.GetTransformedCopy( transform.T() ) );
 }
