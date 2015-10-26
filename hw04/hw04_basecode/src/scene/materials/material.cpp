@@ -23,6 +23,8 @@ Material::Material(const glm::vec3 &color):
 glm::vec3 Material::EvaluateScatteredEnergy(const Intersection &isx, const glm::vec3 &woW, const glm::vec3 &wiW, BxDFType flags) const
 {
     //TODO
+
+
     return glm::vec3(0);
 }
 
