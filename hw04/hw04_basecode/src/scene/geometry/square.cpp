@@ -3,13 +3,22 @@
 void SquarePlane::ComputeArea()
 {
     //TODO
-    glm::mat4 t( transform.T() );
+    glm::vec4 vertices[]{
+        { -.5f, -.5f, 0.f, 1.f, },
+        { .5f, -.5f, 0.f, 1.f, },
+        { -.5f, .5f, 0.f, 1.f, },
+    };
 
-    float sx = glm::length( glm::vec3( t[ 0 ][ 0 ], t[ 1 ][ 0 ], t[ 2 ][ 0 ] ) );
-    float sy = glm::length( glm::vec3( t[ 0 ][ 1 ], t[ 1 ][ 1 ], t[ 2 ][ 1 ] ) );
-    float sz = glm::length( glm::vec3( t[ 0 ][ 2 ], t[ 1 ][ 2 ], t[ 2 ][ 2 ] ) );
+    glm::vec4 vertices_world[ 3 ];
 
-    area = sx * sy * sz;
+    for( int i = 0; i < 3; ++i ){
+        vertices_world[ i ] = transform.T() * vertices[ i ];
+    }
+
+    glm::vec3 v01( vertices_world[ 1 ] - vertices_world[ 0 ] );
+    glm::vec3 v03( vertices_world[ 2 ] - vertices_world[ 0 ] );
+
+    area = glm::length( glm::cross( v01, v03 ) );
 }
 
 Intersection SquarePlane::SampleLight( float a, float b ){
@@ -41,6 +50,13 @@ Intersection SquarePlane::GetIntersection(Ray r)
         result.t = glm::distance(result.point, r.origin);
         result.texture_color = Material::GetImageColorInterp(GetUVCoordinates(glm::vec3(P)), material->texture);
         //TODO: Store the tangent and bitangent
+
+        glm::vec4 T( 1.f, 0.f, 0.f, 0.f );
+        glm::vec4 B( 0.f, 1.f, 0.f, 0.f );
+
+        result.tangent = glm::normalize( glm::vec3( transform.invTransT() * T ) );
+        result.bitangent = glm::normalize( glm::vec3( transform.invTransT() * B ) );
+
         return result;
     }
     return result;

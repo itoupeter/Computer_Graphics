@@ -8,7 +8,28 @@ static const int CUB_VERT_COUNT = 24;
 void Cube::ComputeArea()
 {
     //Extra credit to implement this
-    area = 0;
+    glm::vec4 vertices[]{
+        { -.5f, -.5f, .5f, 1.f, },
+        { .5f, -.5f, .5f, 1.f, },
+        { -.5f, .5f, .5f, 1.f, },
+        { -.5f, -.5f, .5f, 1.f, },
+    };
+
+    glm::vec4 vertices_world[ 4 ];
+
+    for( int i = 0; i < 4; ++i ){
+        vertices_world[ i ] = transform.T() * vertices[ i ];
+    }
+
+    glm::vec3 v01( vertices_world[ 1 ] - vertices_world[ 0 ] );
+    glm::vec3 v03( vertices_world[ 2 ] - vertices_world[ 0 ] );
+    glm::vec3 v04( vertices_world[ 3 ] - vertices_world[ 0 ] );
+
+    area = 0.f;
+    area += glm::length( glm::cross( v01, v03 ) );
+    area += glm::length( glm::cross( v03, v04 ) );
+    area += glm::length( glm::cross( v04, v01 ) );
+    area *= 2.f;
 }
 
 glm::vec4 GetCubeNormal(const glm::vec4& P)
@@ -35,8 +56,8 @@ Intersection Cube::GetIntersection(Ray r)
     Ray r_loc = r.GetTransformedCopy(transform.invT());
     Intersection result;
 
-    float t_n = -1000000;
-    float t_f = 1000000;
+    float t_n = -1000000.f;
+    float t_f = 1000000.f;
     for(int i = 0; i < 3; i++){
         //Ray parallel to slab check
         if(r_loc.direction[i] == 0){
@@ -75,12 +96,35 @@ Intersection Cube::GetIntersection(Ray r)
     {
         //Lastly, transform the point found in object space by T
         glm::vec4 P = glm::vec4(r_loc.origin + t_final*r_loc.direction, 1);
+        glm::vec4 N( glm::normalize( GetCubeNormal( P ) ) );
         result.point = glm::vec3(transform.T() * P);
-        result.normal = glm::normalize(glm::vec3(transform.invTransT() * GetCubeNormal(P)));
+        result.normal = glm::normalize(glm::vec3(transform.invTransT() * N));
         result.object_hit = this;
         result.t = glm::distance(result.point, r.origin);
         result.texture_color = Material::GetImageColorInterp(GetUVCoordinates(glm::vec3(P)), material->texture);
         //TODO: Store the tangent and bitangent
+
+        glm::vec4 T( 0.f ), B( 0.f );
+
+        if( N[ 0 ] < -.9f ){
+            T = glm::vec4( 0.f, -1.f, 0.f, 0.f );
+        }else if( N[ 0 ] > .9f ){
+            T = glm::vec4( 0.f, 1.f, 0.f, 0.f );
+        }else if( N[ 1 ] < -.9f ){
+            T = glm::vec4( 0.f, 0.f, -1.f, 0.f );
+        }else if( N[ 1 ] > .9f ){
+            T = glm::vec4( 0.f, 0.f, 1.f, 0.f );
+        }else if( N[ 2 ] < -.9f ){
+            T = glm::vec4( -1.f, 0.f, 0.f, 0.f );
+        }else{
+            T = glm::vec4( 1.f, 0.f, 0.f, 0.f );
+        }
+
+        B = glm::vec4( glm::cross( glm::vec3( N ), glm::vec3( T ) ), 0.f );
+
+        result.tangent = glm::normalize( glm::vec3( transform.invTransT() * T ) );
+        result.bitangent = glm::normalize( glm::vec3( transform.invTransT() * B ) );
+
         return result;
     }
     else{
@@ -199,7 +243,6 @@ void createCubeVertexPositions(glm::vec3 (&cub_vert_pos)[CUB_VERT_COUNT])
     //UL
     cub_vert_pos[idx++] = glm::vec3(-0.5f, -0.5f, 0.5f);
 }
-
 
 void createCubeVertexNormals(glm::vec3 (&cub_vert_nor)[CUB_VERT_COUNT])
 {

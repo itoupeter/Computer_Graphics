@@ -11,7 +11,28 @@ static const int SPH_VERT_COUNT = 382;
 void Sphere::ComputeArea()
 {
     //Extra credit to implement this
-    area = 0;
+    glm::vec4 vertices[]{
+        { -.5f, -.5f, .5f, 1.f, },
+        { .5f, -.5f, .5f, 1.f, },
+        { -.5f, .5f, .5f, 1.f, },
+        { -.5f, -.5f, .5f, 1.f, },
+    };
+
+    glm::vec4 vertices_world[ 4 ];
+
+    for( int i = 0; i < 4; ++i ){
+        vertices_world[ i ] = transform.T() * vertices[ i ];
+    }
+
+    glm::vec3 v01( vertices_world[ 1 ] - vertices_world[ 0 ] );
+    glm::vec3 v03( vertices_world[ 2 ] - vertices_world[ 0 ] );
+    glm::vec3 v04( vertices_world[ 3 ] - vertices_world[ 0 ] );
+
+    area = 0.f;
+    area += glm::length( glm::cross( v01, v03 ) );
+    area += glm::length( glm::cross( v03, v04 ) );
+    area += glm::length( glm::cross( v04, v01 ) );
+    area *= PI / 3.f;
 }
 
 glm::vec3 Sphere::ComputeNormal(const glm::vec3 &P)
@@ -40,13 +61,32 @@ Intersection Sphere::GetIntersection(Ray r)
     {
         glm::vec4 P = glm::vec4(r_loc.origin + t*r_loc.direction, 1);
         result.point = glm::vec3(transform.T() * P);
-        glm::vec3 normal = glm::normalize(glm::vec3(P));
         glm::vec2 uv = GetUVCoordinates(glm::vec3(P));
         result.normal = glm::normalize(glm::vec3(transform.invTransT() * (P - glm::vec4(0,0,0,1))));
         result.t = glm::distance(result.point, r.origin);
         result.texture_color = Material::GetImageColorInterp(uv, material->texture);
         result.object_hit = this;
         //TODO: Store the tangent and bitangent
+
+        glm::vec3 N( glm::normalize( glm::vec3( P ) ) );
+        glm::vec4 T, B;
+
+        if( glm::length( N - glm::vec3( 0.f, 0.f, 1.f ) ) < 1e-5 ){
+            T = glm::vec4( 1.f, 0.f, 0.f, 0.f );
+            B = glm::vec4( 0.f, 1.f, 0.f, 0.f );
+        }else if( glm::length( N - glm::vec3( 0.f, 0.f, -1.f ) ) ){
+            T = glm::vec4( 1.f, 0.f, 0.f, 0.f );
+            B = glm::vec4( 0.f, -1.f, 0.f, 0.f );
+        }else{
+            glm::vec3 Z( 0.f, 0.f, 1.f );
+
+            T = glm::vec4( glm::cross( Z, N ), 0.f );
+            B = glm::vec4( glm::cross( N, glm::vec3( T ) ), 0.f );
+        }
+
+        result.tangent = glm::normalize( glm::vec3( transform.invTransT() * T ) );
+        result.bitangent = glm::normalize( glm::vec3( transform.invTransT() * B ) );
+
         return result;
     }
     return result;

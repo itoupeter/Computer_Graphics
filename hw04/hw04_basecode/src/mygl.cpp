@@ -277,4 +277,5 @@ void MyGL::RaytraceScene()
     }
 #endif
     scene.film.WriteImage(filepath);
+    std::cout << "\n---OK!---" << std::endl;
 }

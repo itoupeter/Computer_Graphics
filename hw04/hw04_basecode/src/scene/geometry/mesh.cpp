@@ -6,13 +6,32 @@
 void Triangle::ComputeArea()
 {
     //Extra credit to implement this
-    area = 0;
+    glm::vec3 v01( points[ 1 ] - points[ 0 ] );
+    glm::vec3 v02( points[ 2 ] - points[ 0 ] );
+
+    area = .5f * glm::length( glm::cross( v01, v02 ) );
 }
 
 void Mesh::ComputeArea()
 {
     //Extra credit to implement this
-    area = 0;
+    glm::mat4 t( transform.T() );
+
+    for( Triangle *triangle : faces ){
+
+        glm::vec4 vertices_world[]{
+            t * glm::vec4( triangle->points[ 0 ], 1.f ),
+            t * glm::vec4( triangle->points[ 1 ], 1.f ),
+            t * glm::vec4( triangle->points[ 2 ], 1.f ),
+        };
+
+        glm::vec3 v01( vertices_world[ 1 ] - vertices_world[ 0 ] );
+        glm::vec3 v02( vertices_world[ 2 ] - vertices_world[ 0 ] );
+
+        area += glm::length( glm::cross( v01, v02 ) );
+    }
+
+    area *= .5f;
 }
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3):
@@ -90,6 +109,24 @@ Intersection Triangle::GetIntersection(Ray r){
         result.texture_color = Material::GetImageColorInterp(GetUVCoordinates(glm::vec3(P)), material->texture);
         result.object_hit = this;
         //TODO: Store the tangent and bitangent
+
+        glm::vec4 v01_pos( points[ 1 ] - points[ 0 ], 0.f );
+        glm::vec4 v02_pos( points[ 2 ] - points[ 0 ], 0.f );
+
+        glm::vec3 v01_pos_world( transform.T() * v01_pos );
+        glm::vec3 v02_pos_world( transform.T() * v02_pos );
+
+        glm::vec2 p0_uv( GetUVCoordinates( points[ 0 ] ) );
+        glm::vec2 p1_uv( GetUVCoordinates( points[ 1 ] ) );
+        glm::vec2 p2_uv( GetUVCoordinates( points[ 2 ] ) );
+
+        glm::vec2 v01_uv( p1_uv - p0_uv );
+        glm::vec2 v02_uv( p2_uv - p0_uv );
+
+        result.tangent = ( v02_uv[ 1 ] * v01_pos_world - v01_uv[ 1 ] * v02_pos_world )
+                / ( v02_uv[ 1 ] * v01_uv[ 0 ] - v01_uv[ 0 ] * v02_uv[ 1 ] );
+        result.bitangent = ( v02_pos_world - v02_uv[ 0 ] * result.tangent ) / v02_uv[ 1 ];
+
     }
     return result;
 }
@@ -112,7 +149,28 @@ Intersection Mesh::GetIntersection(Ray r){
         closest.object_hit = this;
         closest.t = glm::distance(closest.point, r.origin);//The t used for the closest triangle test was in object space
         //TODO: Store the tangent and bitangent
+
+        glm::vec4 v01_pos( tri->points[ 1 ] - tri->points[ 0 ], 0.f );
+        glm::vec4 v02_pos( tri->points[ 2 ] - tri->points[ 0 ], 0.f );
+
+        glm::vec3 v01_pos_world( transform.T() * v01_pos );
+        glm::vec3 v02_pos_world( transform.T() * v02_pos );
+
+        glm::vec2 p0_uv( tri->GetUVCoordinates( tri->points[ 0 ] ) );
+        glm::vec2 p1_uv( tri->GetUVCoordinates( tri->points[ 1 ] ) );
+        glm::vec2 p2_uv( tri->GetUVCoordinates( tri->points[ 2 ] ) );
+
+        glm::vec2 v01_uv( p1_uv - p0_uv );
+        glm::vec2 v02_uv( p2_uv - p0_uv );
+
+        closest.tangent = ( v02_uv[ 1 ] * v01_pos_world - v01_uv[ 1 ] * v02_pos_world )
+                / ( v02_uv[ 1 ] * v01_uv[ 0 ] - v01_uv[ 0 ] * v02_uv[ 1 ] );
+        closest.bitangent = ( v02_pos_world - v02_uv[ 0 ] * closest.tangent ) / v02_uv[ 1 ];
+
+        closest.tangent = glm::normalize( closest.tangent );
+        closest.bitangent = glm::normalize( closest.bitangent );
     }
+
     return closest;
 }
 
