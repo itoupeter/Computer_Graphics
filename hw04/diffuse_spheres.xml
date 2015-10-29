@@ -72,8 +72,9 @@
 
 	<geometry type="square" name="Light Source">
 		<transform>
-			<translate>0 5 0</translate>
+			<translate>0 4 0</translate>
 			<scale>3 3 3</scale>
+			<rotate>90 0 0</rotate>
 		</transform>
 		<material>emissive_material</material>
 	</geometry>

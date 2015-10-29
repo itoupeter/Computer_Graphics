@@ -1,11 +1,17 @@
 #include <raytracing/integrator.h>
-
+#include <raytracing/directlightingintegrator.h>
 
 Integrator::Integrator():
     max_depth(5)
 {
     scene = NULL;
     intersection_engine = NULL;
+}
+
+Integrator::Integrator( Scene *s ):
+    Integrator(){
+
+    scene = s;
 }
 
 glm::vec3 ComponentMult(const glm::vec3 &a, const glm::vec3 &b)
@@ -20,6 +26,7 @@ void Integrator::SetDepth(unsigned int depth)
 
 glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
 
-    return glm::vec3( 0.f );
+    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
 
+    return directLightingIntegrator.TraceRay( r );
 }

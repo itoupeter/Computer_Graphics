@@ -23,13 +23,12 @@ void SquarePlane::ComputeArea()
 
 Intersection SquarePlane::SampleLight( float a, float b ){
 
-    glm::vec3 o( a, b, 1.f );
+    glm::vec3 o( a - .5f, b - .5f, 1.f );
     glm::vec3 d( 0.f, 0.f, -1.f );
 
     Ray r( o, d );
 
     return GetIntersection( r.GetTransformedCopy( transform.T() ) );
-
 }
 
 Intersection SquarePlane::GetIntersection(Ray r)

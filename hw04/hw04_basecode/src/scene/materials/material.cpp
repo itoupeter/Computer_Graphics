@@ -1,4 +1,5 @@
 #include <scene/materials/material.h>
+#include <scene/materials/bxdfs/lambertBxDF.h>
 #include <QColor>
 #include <math.h>
 
@@ -17,15 +18,27 @@ Material::Material(const glm::vec3 &color):
     normal_map = NULL;
 }
 
-
-
-
 glm::vec3 Material::EvaluateScatteredEnergy(const Intersection &isx, const glm::vec3 &woW, const glm::vec3 &wiW, BxDFType flags) const
 {
     //TODO
+    glm::mat3 w2t;
 
+    w2t[ 0 ][ 0 ] = isx.tangent[ 0 ];
+    w2t[ 1 ][ 0 ] = isx.tangent[ 1 ];
+    w2t[ 2 ][ 0 ] = isx.tangent[ 2 ];
 
-    return glm::vec3(0);
+    w2t[ 0 ][ 1 ] = isx.bitangent[ 0 ];
+    w2t[ 1 ][ 1 ] = isx.bitangent[ 1 ];
+    w2t[ 2 ][ 1 ] = isx.bitangent[ 2 ];
+
+    w2t[ 0 ][ 2 ] = isx.normal[ 0 ];
+    w2t[ 1 ][ 2 ] = isx.normal[ 1 ];
+    w2t[ 2 ][ 2 ] = isx.normal[ 2 ];
+
+    glm::vec3 wo( w2t * woW );
+    glm::vec3 wi( w2t * wiW );
+
+    return bxdfs.front()->EvaluateScatteredEnergy( wo, wi ) * isx.texture_color * isx.object_hit->material->base_color;
 }
 
 glm::vec3 Material::SampleAndEvaluateScatteredEnergy(const Intersection &isx, const glm::vec3 &woW, glm::vec3 &wiW_ret, float &pdf_ret, BxDFType flags) const
@@ -41,13 +54,6 @@ glm::vec3 Material::EvaluateHemisphereScatteredEnergy(const Intersection &isx, c
     //TODO
     return glm::vec3(0);
 }
-
-
-
-
-
-
-
 
 glm::vec3 Material::GetImageColor(const glm::vec2 &uv_coord, const QImage* const& image)
 {
@@ -80,6 +86,7 @@ glm::vec3 Material::GetImageColorInterp(const glm::vec2 &uv_coord, const QImage*
         glm::vec2 floors = glm::vec2(floor(X), floor(Y));
         glm::vec2 ceils = glm::vec2(ceil(X), ceil(Y));
         ceils = glm::min(ceils, glm::vec2(image->width()-1, image->height()-1));
+
         QColor qll = image->pixel(floors.x, floors.y); glm::vec3 ll(qll.red(), qll.green(), qll.blue());
         QColor qlr = image->pixel(ceils.x, floors.y); glm::vec3 lr(qlr.red(), qlr.green(), qlr.blue());
         QColor qul = image->pixel(floors.x, ceils.y); glm::vec3 ul(qul.red(), qul.green(), qul.blue());

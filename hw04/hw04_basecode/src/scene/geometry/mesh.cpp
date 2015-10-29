@@ -43,11 +43,9 @@ Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3
     }
 }
 
-
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3):
     Triangle(p1, p2, p3, n1, n2, n3, glm::vec2(0), glm::vec2(0), glm::vec2(0))
 {}
-
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &n1, const glm::vec3 &n2, const glm::vec3 &n3, const glm::vec2 &t1, const glm::vec2 &t2, const glm::vec2 &t3)
 {
@@ -86,6 +84,7 @@ glm::vec4 Triangle::GetNormal(const glm::vec4 &position)
 
 glm::vec3 Triangle::ComputeNormal(const glm::vec3 &P)
 {}
+
 glm::vec3 Mesh::ComputeNormal(const glm::vec3 &P)
 {}
 
@@ -187,7 +186,6 @@ glm::vec2 Mesh::GetUVCoordinates(const glm::vec3 &point)
 {
     return glm::vec2();
 }
-
 
 glm::vec2 Triangle::GetUVCoordinates(const glm::vec3 &point)
 {

@@ -14,8 +14,8 @@ float Geometry::RayPDF(const Intersection &isx, const Ray &ray)
             isx.object_hit->ComputeArea();
         }
 
-        float A( glm::normalize( isx.normal ) );
-        float R( glm::normalize( -ray.direction ) );
+        glm::vec3 A( glm::normalize( -isx.normal ) );
+        glm::vec3 R( glm::normalize( ray.direction ) );
         float r2( glm::length2( R ) );
         float area( isx.object_hit->area );
         float cos_theta( glm::dot( A, R ) );

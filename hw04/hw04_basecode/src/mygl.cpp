@@ -190,6 +190,7 @@ void MyGL::SceneLoadDialog()
     integrator.intersection_engine = &intersection_engine;
     intersection_engine.scene = &scene;
     update();
+
 }
 
 void MyGL::RaytraceScene()
