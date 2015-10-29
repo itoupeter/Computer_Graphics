@@ -2,7 +2,7 @@
 #include <ctime>
 #include "raytracing/directlightingintegrator.h"
 
-const int DirectLightingIntegrator::N = 1;
+const int DirectLightingIntegrator::N = 2;
 
 DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
     Integrator(),
@@ -25,6 +25,12 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
 
     //---compute intersection with scene---
     Intersection isx( intersection_engine->GetIntersection( r ) );
+
+    //---no intersection---
+    if( isx.object_hit == NULL ) return black;
+
+    //---hit light---
+    if( isx.object_hit->material->is_light_source ) return isx.texture_color;
 
     //---has intersection---
     glm::vec3 light_color( 0.f );
@@ -49,7 +55,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
                     //---BRDF---
                     * isx.object_hit->material->EvaluateScatteredEnergy( isx, woW, wiW )
                     //---L---
-                    * pLight->material->EvaluateScatteredEnergy( sample, woW, -wiW )
+                    * pLight->material->EvaluateScatteredEnergy( sample, woW, -woW )
                     //---shadow---
                     * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
                     //---lambertian term---
@@ -87,5 +93,6 @@ glm::vec3 DirectLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::v
         else return white;
     }
 
+    //---impossible---
     return green;
 }
