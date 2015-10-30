@@ -2,7 +2,7 @@
 #include <ctime>
 #include "raytracing/directlightingintegrator.h"
 
-const int DirectLightingIntegrator::N = 5;
+const int DirectLightingIntegrator::N = 10;
 
 DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
     Integrator(),
@@ -26,7 +26,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
 
     //---hit light---
     if( isx.object_hit->material->is_light_source )
-        return isx.object_hit->material->EvaluateScatteredEnergy( isx, glm::vec3( 0.f ), -r.direction );
+        return isx.texture_color * isx.object_hit->material->base_color;
 
     //---has intersection---
     glm::vec3 light_color( 0.f );
