@@ -37,8 +37,9 @@ void Sphere::ComputeArea()
 
 Intersection Sphere::SampleLight( float a, float b, float c ){
 
-    float theta( TWO_PI * a );
-    float u( b * 2.f - 1.f );
+    float phi( PI * a );
+    float u( cosf( phi ) );
+    float theta( TWO_PI * b );
 
     float x( sqrt( 1 - u * u ) * cosf( theta ) );
     float y( sqrt( 1 - u * u ) * sinf( theta ) );
