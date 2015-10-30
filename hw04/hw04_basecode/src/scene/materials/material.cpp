@@ -35,8 +35,8 @@ glm::vec3 Material::EvaluateScatteredEnergy(const Intersection &isx, const glm::
     w2t[ 1 ][ 2 ] = isx.normal[ 1 ];
     w2t[ 2 ][ 2 ] = isx.normal[ 2 ];
 
-    glm::vec3 wo( w2t * woW );
-    glm::vec3 wi( w2t * wiW );
+    glm::vec3 wo( glm::normalize( w2t * woW ) );
+    glm::vec3 wi( glm::normalize( w2t * wiW ) );
 
     return bxdfs.front()->EvaluateScatteredEnergy( wo, wi ) * isx.texture_color * isx.object_hit->material->base_color;
 }

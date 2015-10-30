@@ -21,7 +21,7 @@ void SquarePlane::ComputeArea()
     area = glm::length( glm::cross( v01, v03 ) );
 }
 
-Intersection SquarePlane::SampleLight( float a, float b ){
+Intersection SquarePlane::SampleLight( float a, float b, float c ){
 
     glm::vec3 o( a - .5f, b - .5f, 1.f );
     glm::vec3 d( 0.f, 0.f, -1.f );

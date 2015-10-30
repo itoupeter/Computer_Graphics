@@ -35,6 +35,23 @@ void Sphere::ComputeArea()
     area *= PI / 3.f;
 }
 
+Intersection Sphere::SampleLight( float a, float b, float c ){
+
+    float theta( TWO_PI * a );
+    float u( b * 2.f - 1.f );
+
+    float x( sqrt( 1 - u * u ) * cosf( theta ) );
+    float y( sqrt( 1 - u * u ) * sinf( theta ) );
+    float z( u );
+
+    glm::vec3 ray_o( x, y, z );
+    glm::vec3 ray_d( -x, -y, -z );
+
+    Ray ray( ray_o, ray_d );
+
+    return GetIntersection( ray.GetTransformedCopy( transform.T() ) );
+}
+
 glm::vec3 Sphere::ComputeNormal(const glm::vec3 &P)
 {}
 

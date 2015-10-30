@@ -12,6 +12,11 @@ void Triangle::ComputeArea()
     area = .5f * glm::length( glm::cross( v01, v02 ) );
 }
 
+Intersection Triangle::SampleLight( float a, float b, float c ){
+
+    return Intersection();
+}
+
 void Mesh::ComputeArea()
 {
     //Extra credit to implement this
@@ -32,6 +37,31 @@ void Mesh::ComputeArea()
     }
 
     area *= .5f;
+}
+
+Intersection Mesh::SampleLight( float a, float b, float c ){
+
+    Triangle *triangle_hit( faces[ int( c * faces.size() ) ] );
+
+    glm::vec3 v0( triangle_hit->points[ 0 ] );
+    glm::vec3 v1( triangle_hit->points[ 1 ] );
+    glm::vec3 v2( triangle_hit->points[ 2 ] );
+
+    glm::vec3 v01( v1 - v0 );
+    glm::vec3 v02( v2 - v0 );
+
+    if( a + b > 1.f ){
+        a = 1.f - a;
+        b = 1.f - b;
+    }
+
+    glm::vec3 sample( v0 + a * v01 + b * v02 );
+    glm::vec3 N( triangle_hit->plane_normal );
+    glm::vec3 ray_o( sample + N * .1f );
+    glm::vec3 ray_d( -N );
+
+    return GetIntersection( Ray( ray_o, ray_d ).GetTransformedCopy( transform.T() ) );
+
 }
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3):
@@ -139,6 +169,7 @@ Intersection Mesh::GetIntersection(Ray r){
             closest = isx;
         }
     }
+
     if(closest.object_hit != NULL)
     {
         Triangle* tri = (Triangle*)closest.object_hit;

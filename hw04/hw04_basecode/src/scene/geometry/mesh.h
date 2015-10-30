@@ -15,13 +15,15 @@ public:
 
     virtual void ComputeArea();
 
+    virtual Intersection SampleLight( float a, float b, float c );
+
     glm::vec3 points[3];
     glm::vec3 normals[3];
     glm::vec2 uvs[3];
     glm::vec3 plane_normal;
 
     void create();//This does nothing because individual triangles are not rendered with OpenGL;
-                            //they are rendered all together in their Mesh.
+                  //they are rendered all together in their Mesh.
 
     glm::vec3 GetNormal(const glm::vec3 &position);//Returns the interpolation of the triangle's three normals
                                                     //based on the point inside the triangle that is given.
@@ -42,6 +44,9 @@ public:
 
     virtual void ComputeArea();
 
+    virtual Intersection SampleLight( float a, float b, float c = 0.f );
+
 private:
     QList<Triangle*> faces;
+    QList< float > areas;
 };

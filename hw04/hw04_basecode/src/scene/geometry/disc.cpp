@@ -21,7 +21,7 @@ void Disc::ComputeArea()
     area = .25f * PI * glm::length( glm::cross( v01, v03 ) );
 }
 
-Intersection Disc::SampleLight( float a, float b ){
+Intersection Disc::SampleLight( float a, float b, float c ){
 
     float sqrt_r( sqrt( a ) );
     float theta( b * TWO_PI );
@@ -29,12 +29,12 @@ Intersection Disc::SampleLight( float a, float b ){
     float x( sqrt_r * cos( theta ) );
     float y( sqrt_r * sin( theta ) );
 
-    glm::vec3 o( x, y, 1.f );
+    glm::vec3 o( x * 0.5f, y * 0.5f, 1.f );
     glm::vec3 d( 0.f, 0.f, -1.f );
 
-    Ray r( o, d );
+    Ray ray( o, d );
 
-    return GetIntersection( r.GetTransformedCopy( transform.T() ) );
+    return GetIntersection( ray.GetTransformedCopy( transform.T() ) );
 }
 
 Intersection Disc::GetIntersection(Ray r)

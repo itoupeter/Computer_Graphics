@@ -13,4 +13,6 @@ public:
     void create();
 
     virtual void ComputeArea();
+
+    virtual Intersection SampleLight( float a, float b, float c );
 };

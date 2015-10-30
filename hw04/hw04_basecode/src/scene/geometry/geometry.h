@@ -21,7 +21,6 @@ public:
     }
 //Functions
     virtual ~Geometry(){}
-    virtual Intersection SampleLight( float a, float b );
     virtual Intersection GetIntersection(Ray r) = 0;
     virtual void SetMaterial(Material* m){material = m;}
     virtual glm::vec2 GetUVCoordinates(const glm::vec3 &point) = 0;
@@ -37,6 +36,9 @@ public:
     //so you'll never have a skewed shape
     virtual void ComputeArea() = 0;
 
+    //function used to sample point
+    //only for light
+    virtual Intersection SampleLight( float a, float b, float c ) = 0;
 
 //Member variables
     QString name;//Mainly used for debugging purposes

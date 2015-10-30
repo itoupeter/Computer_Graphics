@@ -32,6 +32,54 @@ void Cube::ComputeArea()
     area *= 2.f;
 }
 
+Intersection Cube::SampleLight( float a, float b, float c ){
+
+    glm::vec3 ray_o( 0.f );
+    glm::vec3 ray_d( 0.f );
+
+    a -= .5f;
+    b -= .5f;
+
+    int hit_face( c * 6.f );
+
+    switch ( hit_face ) {
+    case 0:
+        //--- x+ ---
+        ray_o = glm::vec3( 1.f, a, b );
+        ray_d = glm::vec3( -1.f, 0.f, 0.f );
+        break;
+    case 1:
+        //--- x- ---
+        ray_o = glm::vec3( -1.f, a, b );
+        ray_d = glm::vec3( 1.f, 0.f, 0.f );
+        break;
+    case 2:
+        //--- y+ ---
+        ray_o = glm::vec3( a, 1.f, b );
+        ray_d = glm::vec3( 0.f, -1.f, 0.f );
+        break;
+    case 3:
+        //--- y- ---
+        ray_o = glm::vec3( a, -1.f, b );
+        ray_d = glm::vec3( 0.f, 1.f, 0.f );
+        break;
+    case 4:
+        //--- z+ ---
+        ray_o = glm::vec3( a, b, 1.f );
+        ray_d = glm::vec3( 0.f, 0.f, -1.f );
+        break;
+    case 5:
+        //--- z- ---
+        ray_o = glm::vec3( a, b, -1.f );
+        ray_d = glm::vec3( 0.f, 0.f, 1.f );
+        break;
+    }
+
+    Ray ray( ray_o, ray_d );
+
+    return GetIntersection( ray.GetTransformedCopy( transform.T() ) );
+}
+
 glm::vec4 GetCubeNormal(const glm::vec4& P)
 {
     int idx = 0;

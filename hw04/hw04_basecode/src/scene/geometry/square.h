@@ -7,10 +7,11 @@ class SquarePlane : public Geometry
 {
 public:
     Intersection GetIntersection(Ray r);
-    Intersection SampleLight( float a, float b );
     virtual glm::vec2 GetUVCoordinates(const glm::vec3 &point);
     virtual glm::vec3 ComputeNormal(const glm::vec3 &P);
     void create();
 
     virtual void ComputeArea();
+
+    virtual Intersection SampleLight( float a, float b, float c );
 };

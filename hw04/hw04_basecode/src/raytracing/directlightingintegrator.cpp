@@ -2,7 +2,7 @@
 #include <ctime>
 #include "raytracing/directlightingintegrator.h"
 
-const int DirectLightingIntegrator::N = 2;
+const int DirectLightingIntegrator::N = 5;
 
 DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
     Integrator(),
@@ -16,12 +16,7 @@ DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEn
 
 glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
 
-    static const glm::vec3 white( 1.f );
     static const glm::vec3 black( 0.f );
-    static const glm::vec3 red( 1.f, 0.f, 0.f );
-    static const glm::vec3 green( 0.f, 1.f, 0.f );
-    static const glm::vec3 blue( 0.f, 0.f, 1.f );
-    static const glm::vec3 yellow( 1.f, 1.f, 0.f );
 
     //---compute intersection with scene---
     Intersection isx( intersection_engine->GetIntersection( r ) );
@@ -30,7 +25,8 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
     if( isx.object_hit == NULL ) return black;
 
     //---hit light---
-    if( isx.object_hit->material->is_light_source ) return isx.texture_color;
+    if( isx.object_hit->material->is_light_source )
+        return isx.object_hit->material->EvaluateScatteredEnergy( isx, glm::vec3( 0.f ), -r.direction );
 
     //---has intersection---
     glm::vec3 light_color( 0.f );
@@ -42,10 +38,12 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
 
             float a( distribution( generator ) );
             float b( distribution( generator ) );
+            float c( distribution( generator ) );
 
-            Intersection sample( pLight->SampleLight( a, b ) );
+            Intersection sample( pLight->SampleLight( a, b, c ) );
             glm::vec3 wiW( r.direction );
             glm::vec3 woW( glm::normalize( glm::vec3( sample.point - isx.point ) ) );
+            //---ray from p to light---
             Ray ray( isx.point, woW );
             float PDF( isx.object_hit->RayPDF( sample, ray ) );
 
@@ -55,18 +53,18 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
                     //---BRDF---
                     * isx.object_hit->material->EvaluateScatteredEnergy( isx, woW, wiW )
                     //---L---
-                    * pLight->material->EvaluateScatteredEnergy( sample, woW, -woW )
+                    * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -woW )
                     //---shadow---
                     * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
                     //---lambertian term---
-                    * glm::dot( isx.normal, glm::normalize( woW ) )
+                    * glm::dot( isx.normal, woW )
                     //---ray PDF---
                     / PDF
                     ;
         }
     }
 
-    return light_color / float( DirectLightingIntegrator::N );
+    return light_color / float( DirectLightingIntegrator::N ) / float( scene->lights.size() );
 
 }
 
@@ -76,8 +74,6 @@ glm::vec3 DirectLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::v
     static const glm::vec3 black( 0.f );
     static const glm::vec3 red( 1.f, 0.f, 0.f );
     static const glm::vec3 green( 0.f, 1.f, 0.f );
-    static const glm::vec3 blue( 0.f, 0.f, 1.f );
-    static const glm::vec3 yellow( 1.f, 1.f, 0.f );
 
     Ray ray( o, d - o );
     QList< Intersection > isxes( intersection_engine->GetAllIntersections( ray ) );
