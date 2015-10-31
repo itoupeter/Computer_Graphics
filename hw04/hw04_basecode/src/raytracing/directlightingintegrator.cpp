@@ -2,7 +2,7 @@
 #include <ctime>
 #include "raytracing/directlightingintegrator.h"
 
-const int DirectLightingIntegrator::N = 1;
+const int DirectLightingIntegrator::N = 4;
 
 DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
     Integrator(),

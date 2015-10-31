@@ -22,8 +22,6 @@ void Mesh::ComputeArea()
     //Extra credit to implement this
     glm::mat4 t( transform.T() );
 
-    int index( 0 );
-
     for( Triangle *triangle : faces ){
 
         glm::vec4 vertices_world[]{
@@ -36,13 +34,34 @@ void Mesh::ComputeArea()
         glm::vec3 v02( vertices_world[ 2 ] - vertices_world[ 0 ] );
 
         area += .5f * glm::length( glm::cross( v01, v02 ) );
-        areas_prefix[ index++ ] = area;
+        areas_prefix.push_back( area );
     }
+}
+
+int bisect_find( QList< float > &list, float c ){
+
+    int lower_bound( 0 );
+    int upper_bound( list.size() - 1 );
+    int mid;
+
+    while( upper_bound - lower_bound ){
+
+        mid = upper_bound + lower_bound >> 1;
+
+        if( c <= list[ mid ] )
+            upper_bound = mid;
+        else
+            lower_bound = mid + 1;
+    }
+
+    return upper_bound;
 }
 
 Intersection Mesh::SampleLight( float a, float b, float c ){
 
-    Triangle *triangle_hit( faces[ int( c * faces.size() ) ] );
+    int index( bisect_find( areas_prefix, c * area ) );
+
+    Triangle *triangle_hit( faces[ index ] );
 
     glm::vec3 v0( triangle_hit->points[ 0 ] );
     glm::vec3 v1( triangle_hit->points[ 1 ] );
