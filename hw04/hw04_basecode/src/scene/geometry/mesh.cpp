@@ -22,6 +22,8 @@ void Mesh::ComputeArea()
     //Extra credit to implement this
     glm::mat4 t( transform.T() );
 
+    int index( 0 );
+
     for( Triangle *triangle : faces ){
 
         glm::vec4 vertices_world[]{
@@ -33,10 +35,9 @@ void Mesh::ComputeArea()
         glm::vec3 v01( vertices_world[ 1 ] - vertices_world[ 0 ] );
         glm::vec3 v02( vertices_world[ 2 ] - vertices_world[ 0 ] );
 
-        area += glm::length( glm::cross( v01, v02 ) );
+        area += .5f * glm::length( glm::cross( v01, v02 ) );
+        areas_prefix[ index++ ] = area;
     }
-
-    area *= .5f;
 }
 
 Intersection Mesh::SampleLight( float a, float b, float c ){
@@ -61,7 +62,6 @@ Intersection Mesh::SampleLight( float a, float b, float c ){
     glm::vec3 ray_d( -N );
 
     return GetIntersection( Ray( ray_o, ray_d ).GetTransformedCopy( transform.T() ) );
-
 }
 
 Triangle::Triangle(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3):

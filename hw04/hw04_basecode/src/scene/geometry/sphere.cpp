@@ -102,8 +102,8 @@ Intersection Sphere::GetIntersection(Ray r)
             B = glm::vec4( glm::cross( N, glm::vec3( T ) ), 0.f );
         }
 
-        result.tangent = glm::normalize( glm::vec3( transform.invTransT() * T ) );
-        result.bitangent = glm::normalize( glm::vec3( transform.invTransT() * B ) );
+        result.tangent = glm::normalize( glm::vec3( transform.T() * T ) );
+        result.bitangent = glm::normalize( glm::vec3( transform.T() * B ) );
 
         return result;
     }

@@ -48,5 +48,5 @@ public:
 
 private:
     QList<Triangle*> faces;
-    QList< float > areas;
+    QList< float > areas_prefix;
 };

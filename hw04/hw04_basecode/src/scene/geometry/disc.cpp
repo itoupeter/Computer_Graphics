@@ -62,8 +62,8 @@ Intersection Disc::GetIntersection(Ray r)
         glm::vec4 T( 1.f, 0.f, 0.f, 0.f );
         glm::vec4 B( 0.f, 1.f, 0.f, 0.f );
 
-        result.tangent = glm::normalize( glm::vec3( transform.invTransT() * T ) );
-        result.bitangent = glm::normalize( glm::vec3( transform.invTransT() * B ) );
+        result.tangent = glm::normalize( glm::vec3( transform.T() * T ) );
+        result.bitangent = glm::normalize( glm::vec3( transform.T() * B ) );
 
         return result;
     }
