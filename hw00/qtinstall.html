@@ -1,0 +1,80 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="courseApp" ng-controller="courseController">
+	<head>
+    <link href="../../css/bootstrap.css" rel="stylesheet">
+    <link href="../../css/styles.css" type="text/css" rel="stylesheet" media="screen">
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.js"></script>
+    <script type="text/javascript" src="../../js/ui-bootstrap-tpls-0.11.0.js"></script>
+    <script src="../../js/functions.js"></script>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>{{FULL_COURSE}} Homework 0 - Installing Qt Creator</title>
+	</head>
+
+	<body cis-header>
+		<h1>{{FULL_COURSE}} Homework 0 - Installing Qt Creator</h1>
+
+    <br/>
+
+    <h3>1  Goal</h3>
+    <p>
+      In CIS 560, we will be using the Qt Creator IDE for all of the homework
+      assignments. In order for you to become familiar with Qt, and to
+      make sure that it runs properly on your computer, you will
+      install Qt Creator and run a simple test program that we supply
+      you.
+    </p>
+    <h3>2  Requirements</h3>
+		<h4>2.1  Install Qt Creator</h4>
+		<p>
+			Go to the <a href = "http://download.qt.io/archive/qt/5.4/5.4.2/">Qt download page</a> 
+			and download one of the installers for Qt. During the installation
+			process, just make sure that you install Qt 5.4, which is the
+			version we'll be requiring for this course and is the version
+			that is installed in the Moore 100 labs. You'll also need to install 
+			<a href = "http://download.qt.io/official_releases/qtcreator/3.5/3.5.0/">Qt Creator</a>. 
+			The version of Qt Creator linked is the most current one, but as mentioned below you may have to install an older one 
+			in order to get your debugger working.
+			<br/>
+			<br/>
+			If you are on a Windows machine, make sure you install Qt 5.4 with MinGW, <i>not</i> MSVC. 
+			If you are on a Mac machine, make sure you install Qt 5.4 with Clang.
+			<br/>
+			<br/>
+			If you have a Mac laptop and are having trouble running the debugger in Qt Creator, 
+			we recommend that you install Qt <b>Creator</b> 
+			<a href = "http://download.qt.io/official_releases/qtcreator/3.2/3.2.1/">version 3.2.1</a>, since that 
+			is the IDE version that has a working debugger on Macs. You'll still install Qt 5.4, though; 
+			Qt is the library of files needed to create applications which use 
+			Qt classes, while Qt Creator is the IDE used to create and compile 
+			Qt projects.
+		</p>
+		<h4>2.2  Test your installation</h4>
+		<p>
+			Unzip <a href="Qt_GL_Test.zip">Qt_GL_Test.zip</a>.
+			Open <tt>277.pro</tt> (the main project file) in Qt Creator. The
+			.pro file in the Qt_GL_Test folder is the one you should
+			open. Once you've opened the project file, you should configure
+			it to use Qt 5.4.0. Run the program by pressing the button with
+			the green arrow in the lower-left portion of the UI. When run,
+			the program should produce the following image: <br/> <img src =
+			"expected_results.jpg"/>
+		</p>
+		<h4>2.3  Install TBB</h4>
+		<p>
+			Go to the <a href = "https://www.threadingbuildingblocks.org/">TBB
+			web site</a> and download the TBB package. TBB is a library used for
+			multi-threading your programs, which will be helpful in the future
+			when trying to render an image using Monte-Carlo path tracing. 
+			For now, you just need to download the libraries and install them on your machine.
+			In a later homework assignment writeup, we'll tell you how to set it up to work with the homework basecode, 
+			which is dependent on your operating system.
+		</p>
+		<h3>3  Submission</h3>
+		<p>
+			We do not require you to submit anything for this homework
+			assignment. As long as the program produces the image above, you
+			should be good to go for future assignments.
+		</p>
+	</body>
+</html>
