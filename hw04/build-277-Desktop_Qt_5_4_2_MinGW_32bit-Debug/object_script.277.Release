@@ -30,6 +30,10 @@ INPUT(
 ./release\renderthread.o
 ./release\geometry.o
 ./release\directlightingintegrator.o
+./release\sphere_codebits.o
+./release\weightedmaterial.o
+./release\blinnmicrofacetbxdf.o
+./release\specularreflectionbxdf.o
 ./release\qrc_glsl.o
 ./release\moc_mainwindow.o
 ./release\moc_mygl.o
