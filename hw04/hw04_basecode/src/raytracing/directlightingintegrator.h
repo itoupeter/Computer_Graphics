@@ -12,11 +12,14 @@ public:
     glm::vec3 TraceRay( Ray r );
 
 private:
-    std::uniform_real_distribution< float > distribution;
-    std::mt19937 generator;
-
     //---number of sample per light---
     static const int N;
 };
 
 #endif // DIRECTLIGHTINGINTEGRATOR_H
+
+/*
+#include <chrono>
+static std::uniform_real_distribution<float> rng(0, 1);
+static std::mt19937 seed(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+*/

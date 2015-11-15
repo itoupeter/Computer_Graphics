@@ -21,7 +21,7 @@ float Sphere::RayPDF(const Intersection &isx, const Ray &ray) {
 
     // Compute general sphere weight
     float sinThetaMax2 = radius*radius / glm::distance2(isx.point, Pcenter);
-    float cosThetaMax = glm::sqrt(max(0.f, 1.f - sinThetaMax2));
+    float cosThetaMax = glm::sqrt(fmaxf(0.f, 1.f - sinThetaMax2));
     return UniformConePdf(cosThetaMax);
 }
 
@@ -34,6 +34,7 @@ void Sphere::ComputeArea()
     area = 4.f * PI * glm::pow( ( glm::pow( a * b, 1.6f ) + glm::pow( a * c, 1.6f ) + glm::pow( b * c, 1.6f ) ) / 3.0f, 1 / 1.6f );
 }
 
+/*
 void Sphere::ComputeArea()
 {
     //Extra credit to implement this
@@ -60,6 +61,7 @@ void Sphere::ComputeArea()
     area += glm::length( glm::cross( v04, v01 ) );
     area *= PI / 3.f;
 }
+*/
 
 Intersection Sphere::SampleLight( float a, float b, float c ){
 

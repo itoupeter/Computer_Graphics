@@ -35,11 +35,11 @@ glm::vec3 BxDF::EvaluateHemisphereScatteredEnergy(const glm::vec3 &wo, int num_s
         color += EvaluateScatteredEnergy( wo, wi );
     }
 
-    return color / num_samples;
+    return color / ( float )num_samples;
 }
 
 float BxDF::PDF(const glm::vec3 &wo, const glm::vec3 &wi) const
 {
     //TODO
-    return wo.z * wi.z > 0.f ? wi.z * INV_PI : 0.f;
+    return wo.z * wi.z > 0.f ? fabsf( wi.z ) * INV_PI : 0.f;
 }

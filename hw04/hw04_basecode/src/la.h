@@ -17,7 +17,6 @@
 
 #include <QMatrix4x4>
 
-
 static const float PI = 3.14159265358979323846f;
 static const float TWO_PI = 2 * PI;
 static const float INV_PI = 1.0f / PI;
@@ -51,3 +50,8 @@ inline bool fequal(T a, T b, T epsilon = 0.0001){
 
     return diff / (std::abs(a) + std::abs(b)) < epsilon;
 }
+
+//---random number generator---
+#include <ctime>
+static std::uniform_real_distribution< float > distribution( 0.f, 1.f );
+static std::mt19937 generator( std::time( 0 ) );

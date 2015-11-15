@@ -38,15 +38,41 @@ glm::vec3 Material::EvaluateScatteredEnergy(const Intersection &isx, const glm::
     glm::vec3 wo( glm::normalize( w2t * woW ) );
     glm::vec3 wi( glm::normalize( w2t * wiW ) );
 
-    return bxdfs.front()->EvaluateScatteredEnergy( wo, wi ) * isx.texture_color * isx.object_hit->material->base_color;
+    return bxdfs.front()->EvaluateScatteredEnergy( wo, wi )
+//            * isx.texture_color
+            * isx.object_hit->material->base_color;
 }
 
 glm::vec3 Material::SampleAndEvaluateScatteredEnergy(const Intersection &isx, const glm::vec3 &woW, glm::vec3 &wiW_ret, float &pdf_ret, BxDFType flags) const
 {
     //TODO
-    wiW_ret = glm::vec3(0);
-    pdf_ret = 0.0f;
-    return glm::vec3(0);
+    glm::mat3 w2t;
+
+    w2t[ 0 ][ 0 ] = isx.tangent[ 0 ];
+    w2t[ 1 ][ 0 ] = isx.tangent[ 1 ];
+    w2t[ 2 ][ 0 ] = isx.tangent[ 2 ];
+
+    w2t[ 0 ][ 1 ] = isx.bitangent[ 0 ];
+    w2t[ 1 ][ 1 ] = isx.bitangent[ 1 ];
+    w2t[ 2 ][ 1 ] = isx.bitangent[ 2 ];
+
+    w2t[ 0 ][ 2 ] = isx.normal[ 0 ];
+    w2t[ 1 ][ 2 ] = isx.normal[ 1 ];
+    w2t[ 2 ][ 2 ] = isx.normal[ 2 ];
+
+    glm::mat3 t2w( glm::transpose( w2t ) );
+    glm::vec3 wo( glm::normalize( w2t * woW ) );
+    glm::vec3 wi( 0.f );
+    float PDF( 0.f );
+    float rand1( distribution( generator ) );
+    float rand2( distribution( generator ) );
+
+    glm::vec3 color( bxdfs.front()->SampleAndEvaluateScatteredEnergy( wo, wi, rand1, rand2, PDF ) );
+
+    wiW_ret = t2w * wi;
+    pdf_ret = PDF;
+
+    return color;
 }
 
 glm::vec3 Material::EvaluateHemisphereScatteredEnergy(const Intersection &isx, const glm::vec3 &wo, int num_samples, BxDFType flags) const

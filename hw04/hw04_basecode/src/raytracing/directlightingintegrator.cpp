@@ -2,12 +2,18 @@
 #include <ctime>
 #include "raytracing/directlightingintegrator.h"
 
+float PowerHeuristic( int nf, float fPDF, int ng, float gPDF ){
+
+    float f( nf * fPDF );
+    float g( ng * gPDF );
+
+    return f * f  / ( f * f + g * g );
+}
+
 const int DirectLightingIntegrator::N = 4;
 
 DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
-    Integrator(),
-    distribution( 0.f, 1.f ),
-    generator( std::time( 0 ) ){
+    Integrator(){
 
     this->scene = scene;
     this->intersection_engine = intersection_engine;
@@ -28,44 +34,83 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
     if( isx.object_hit->material->is_light_source )
         return isx.texture_color * isx.object_hit->material->base_color;
 
-    //---has intersection---
+    //---sample a random light---
     glm::vec3 light_color( 0.f );
+    float light_PDF( 0.f );
 
-    for( Geometry *pLight : scene->lights ){
+    {
+        float rand( distribution( generator ) );
+        int nLights( scene->lights.size() );
+        int iLight( rand * nLights );
 
-        //---sample each light---
-        for( int i = 0; i < DirectLightingIntegrator::N; ++i ){
+        Geometry *pLight( scene->lights[ iLight ] );
 
-            float a( distribution( generator ) );
-            float b( distribution( generator ) );
-            float c( distribution( generator ) );
+        float rand1( distribution( generator ) );
+        float rand2( distribution( generator ) );
+        float rand3( distribution( generator ) );
 
-            Intersection sample( pLight->SampleLight( a, b, c ) );
-            glm::vec3 wiW( r.direction );
-            glm::vec3 woW( glm::normalize( glm::vec3( sample.point - isx.point ) ) );
-            //---ray from p to light---
-            Ray ray( isx.point, woW );
-            float PDF( isx.object_hit->RayPDF( sample, ray ) );
+        Intersection sample( pLight->SampleLight( rand1, rand2, rand3 ) );
+        glm::vec3 woW( -r.direction );
+        glm::vec3 wiW( glm::normalize( sample.point - isx.point ) );
+        //---ray from p to light---
+        Ray ray( isx.point + isx.normal * 1e-4f, wiW );
+        light_PDF = isx.object_hit->RayPDF( sample, ray );
 
-            if( PDF < 1e-4 ) continue;
-
-            light_color += 1.f
-                    //---BRDF---
-                    * isx.object_hit->material->EvaluateScatteredEnergy( isx, woW, wiW )
-                    //---L---
-                    * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -woW )
-                    //---shadow---
-                    * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
-                    //---lambertian term---
-                    * glm::dot( isx.normal, woW )
-                    //---ray PDF---
-                    / PDF
-                    ;
+        if( light_PDF > 1e-4 ){
+            light_color = ( float )nLights
+                //---BRDF---
+                * isx.object_hit->material->EvaluateScatteredEnergy( isx, woW, wiW )
+                //---L---
+                * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -woW )
+                //---shadow---
+                * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
+                //---lambertian term---
+                * fabsf( glm::dot( isx.normal, woW ) )
+                //---ray PDF---
+                / light_PDF
+                ;
         }
     }
 
-    return light_color / float( DirectLightingIntegrator::N ) / float( scene->lights.size() );
+    return light_color;
 
+    //---sample a random BxDF---
+    glm::vec3 bxdf_color( 0.f );
+    float bxdf_PDF( 0.f );
+
+    {
+        glm::vec3 wiW( 0.f );
+        glm::vec3 SESE( isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, -r.direction, wiW, bxdf_PDF ) );
+        glm::vec3 ray_o( isx.point + isx.normal * 1e-4f );
+        glm::vec3 ray_d( wiW );
+
+        Intersection hit( intersection_engine->GetIntersection( Ray( ray_o, ray_d ) ) );
+
+        if( hit.object_hit == NULL ) return glm::vec3( .5f );
+
+        if( hit.object_hit != NULL && hit.object_hit->material->is_light_source ){
+
+            glm::vec3 wo( glm::normalize( hit.point - isx.point ) );
+
+            bxdf_color = 1.f
+                    //---BRDF---
+                    * hit.object_hit->material->EvaluateScatteredEnergy( hit, glm::vec3( 0.f ), -wo )
+                    //---L---
+                    * SESE
+                    //---lambertian term---
+                    * fabsf( glm::dot( isx.normal, wo ) )
+                    //---ray PDF---
+                    / bxdf_PDF
+                    ;
+        }
+
+    }
+
+    //---combine color using power heuristic---
+    float light_PH( PowerHeuristic( 1, light_PDF, 1, bxdf_PDF ) );
+    float bxdf_PH( PowerHeuristic( 1, bxdf_PDF, 1, light_PDF ) );
+
+    return light_PH * light_color + bxdf_PH * bxdf_color;
 }
 
 glm::vec3 DirectLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::vec3 &d, const Geometry *pLight ){

@@ -34,10 +34,10 @@ SOURCES += \
     $$PWD/renderthread.cpp \
     $$PWD/scene/geometry/geometry.cpp \
     $$PWD/raytracing/directlightingintegrator.cpp \
-    $$PWD/sphere_codebits.cpp \
     $$PWD/scene/materials/weightedmaterial.cpp \
     $$PWD/scene/materials/bxdfs/blinnmicrofacetbxdf.cpp \
-    $$PWD/scene/materials/bxdfs/specularreflectionbxdf.cpp
+    $$PWD/scene/materials/bxdfs/specularreflectionbxdf.cpp \
+    $$PWD/raytracing/globallightingintegrator.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -79,4 +79,5 @@ HEADERS += \
     $$PWD/raytracing/directlightingintegrator.h \
     $$PWD/scene/materials/weightedmaterial.h \
     $$PWD/scene/materials/bxdfs/blinnmicrofacetbxdf.h \
-    $$PWD/scene/materials/bxdfs/specularreflectionbxdf.h
+    $$PWD/scene/materials/bxdfs/specularreflectionbxdf.h \
+    $$PWD/raytracing/globallightingintegrator.h

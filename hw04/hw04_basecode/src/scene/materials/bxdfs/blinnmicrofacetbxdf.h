@@ -19,4 +19,8 @@ public:
 //Member variables
     glm::vec3 reflection_color;
     float exponent;
+
+    glm::vec3 F( const glm::vec3 &wi, const glm::vec3 &wh ) const;
+    float D( const glm::vec3 &wh ) const;
+    float G( const glm::vec3 &wo, const glm::vec3 &wi, const glm::vec3 &wh ) const;
 };
