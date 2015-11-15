@@ -67,7 +67,9 @@ glm::vec3 Material::SampleAndEvaluateScatteredEnergy(const Intersection &isx, co
     float rand1( distribution( generator ) );
     float rand2( distribution( generator ) );
 
-    glm::vec3 color( bxdfs.front()->SampleAndEvaluateScatteredEnergy( wo, wi, rand1, rand2, PDF ) );
+    glm::vec3 color( bxdfs.front()->SampleAndEvaluateScatteredEnergy( wo, wi, rand1, rand2, PDF )
+                     * isx.object_hit->material->base_color
+                     * isx.texture_color );
 
     wiW_ret = t2w * wi;
     pdf_ret = PDF;

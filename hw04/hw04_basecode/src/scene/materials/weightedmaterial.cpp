@@ -49,6 +49,7 @@ glm::vec3 WeightedMaterial::EvaluateScatteredEnergy( const Intersection &isx, co
 
 glm::vec3 WeightedMaterial::SampleAndEvaluateScatteredEnergy(const Intersection &isx, const glm::vec3 &woW, glm::vec3 &wiW_ret, float &pdf_ret, BxDFType flags) const
 {
+    return isx.object_hit->material->base_color;
     //TODO
     glm::mat3 w2t;
 

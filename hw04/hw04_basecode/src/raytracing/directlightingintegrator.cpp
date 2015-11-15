@@ -34,11 +34,13 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
     if( isx.object_hit->material->is_light_source )
         return isx.texture_color * isx.object_hit->material->base_color;
 
+    int flag( 3 );
+
     //---sample a random light---
     glm::vec3 light_color( 0.f );
     float light_PDF( 0.f );
 
-    {
+    if( flag & 1 ){
         float rand( distribution( generator ) );
         int nLights( scene->lights.size() );
         int iLight( rand * nLights );
@@ -64,7 +66,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
                 * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -woW )
                 //---shadow---
                 * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
-                //---lambertian term---
+                //---cosin term---
                 * fabsf( glm::dot( isx.normal, woW ) )
                 //---ray PDF---
                 / light_PDF
@@ -72,13 +74,13 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
         }
     }
 
-    return light_color;
+    if( flag == 1 ) return light_color;
 
     //---sample a random BxDF---
     glm::vec3 bxdf_color( 0.f );
     float bxdf_PDF( 0.f );
 
-    {
+    if( flag & 2 ){
         glm::vec3 wiW( 0.f );
         glm::vec3 SESE( isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, -r.direction, wiW, bxdf_PDF ) );
         glm::vec3 ray_o( isx.point + isx.normal * 1e-4f );
@@ -86,25 +88,24 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
 
         Intersection hit( intersection_engine->GetIntersection( Ray( ray_o, ray_d ) ) );
 
-        if( hit.object_hit == NULL ) return glm::vec3( .5f );
-
         if( hit.object_hit != NULL && hit.object_hit->material->is_light_source ){
 
-            glm::vec3 wo( glm::normalize( hit.point - isx.point ) );
+            glm::vec3 woW( glm::normalize( hit.point - isx.point ) );
 
             bxdf_color = 1.f
                     //---BRDF---
-                    * hit.object_hit->material->EvaluateScatteredEnergy( hit, glm::vec3( 0.f ), -wo )
+                    * hit.object_hit->material->EvaluateScatteredEnergy( hit, glm::vec3( 0.f ), -woW )
                     //---L---
                     * SESE
-                    //---lambertian term---
-                    * fabsf( glm::dot( isx.normal, wo ) )
+                    //---cosin term---
+                    * fabsf( glm::dot( isx.normal, woW ) )
                     //---ray PDF---
                     / bxdf_PDF
                     ;
         }
-
     }
+
+    if( flag == 2 ) return bxdf_color;
 
     //---combine color using power heuristic---
     float light_PH( PowerHeuristic( 1, light_PDF, 1, bxdf_PDF ) );
