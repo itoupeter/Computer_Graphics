@@ -268,6 +268,7 @@ Material* XMLReader::LoadMaterial(QXmlStreamReader &xml_reader, const QStringRef
                 weight = xml_reader.text().toFloat();
             }
             ((WeightedMaterial*)result)->bxdf_weights.append(weight);
+            xml_reader.readNext();
         }
     }
     return result;

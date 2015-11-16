@@ -94,7 +94,7 @@
 
 	<material type="default" name="SpecularReflective_Material">
 		<baseColor>0.25 0.25 1</baseColor>
-		<bxdf>specular1</bxdf>
+		<bxdf>specularReflection</bxdf>
 	</material>
 
 	<material type="weighted" name="plastic_material">
@@ -166,6 +166,6 @@
 		<maxDepth>5</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>5</pixelSampleLength>
+	<pixelSampleLength>8</pixelSampleLength>
 
 </scene>

@@ -1,7 +1,5 @@
-
-#include "globallightingintegrator.h"
-
-float PowerHeuristic( int nf, float fPDF, int ng, float gPDF );
+#include "raytracing/directlightingintegrator.h"
+#include "raytracing/globallightingintegrator.h"
 
 GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
     Integrator(){
@@ -10,118 +8,68 @@ GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEn
     this->intersection_engine = intersection_engine;
 }
 
-glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r ){
+glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
-    static const glm::vec3 black( 0.f );
+    const glm::vec3 black( 0.f );
 
-    //---compute intersection with scene---
     Intersection isx( intersection_engine->GetIntersection( r ) );
 
-    //---no intersection---
+    //---no intersection with scene---
     if( isx.object_hit == NULL ) return black;
 
-    //---hit light---
+    //---hit light--
     if( isx.object_hit->material->is_light_source )
-        return isx.texture_color * isx.object_hit->material->base_color;
+        return isx.object_hit->material->base_color * isx.texture_color;
 
-    //---sample a random light---
-    glm::vec3 light_color( 0.f );
-    float light_PDF( 0.f );
+    //---global lighting---
+    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
+    glm::vec3 A( 0.f ), B( 1.f );
+    float throughput( 1.f );
 
-    {
-        float rand( distribution( generator ) );
-        int nLights( scene->lights.size() );
-        int iLight( rand * nLights );
+    while( depth < max_depth ){
 
-        Geometry *pLight( scene->lights[ iLight ] );
+        glm::vec3 Li( 0.f ), Ld( 0.f );
 
-        float rand1( distribution( generator ) );
-        float rand2( distribution( generator ) );
-        float rand3( distribution( generator ) );
+        //---direct lighting---
+        Ld = directLightingIntegrator.TraceRay( r, depth );
+        A += B * Ld;
 
-        Intersection sample( pLight->SampleLight( rand1, rand2, rand3 ) );
-        glm::vec3 wiW( r.direction );
-        glm::vec3 woW( glm::normalize( glm::vec3( sample.point - isx.point ) ) );
-        //---ray from p to light---
-        Ray ray( isx.point, woW );
-        light_PDF = isx.object_hit->RayPDF( sample, ray );
+        //---indirect lighting---
+        float pdf_bxdf( 0.f );
+        glm::vec3 wiW_bxdf( 0.f );
+        glm::vec3 bxdf( isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, -r.direction, wiW_bxdf, pdf_bxdf ) );
 
-        if( light_PDF > 1e-4 ){
-            light_color = 1.f
-                //---BRDF---
-                * isx.object_hit->material->EvaluateScatteredEnergy( isx, woW, wiW )
-                //---L---
-                * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -woW )
-                //---shadow---
-                * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
-                //---lambertian term---
-                * fabsf( glm::dot( isx.normal, woW ) )
-                //---ray PDF---
-                / light_PDF
-                ;
+        //---Russian Roulette---
+        //---increament depth---
+        if( depth++ > 2 ){
+
+            float tmp( glm::max( bxdf.x, glm::max( bxdf.y, bxdf.z ) ) );
+            float rand( distribution( generator ) );
+
+            throughput *= tmp * fabsf( glm::dot( wiW_bxdf, isx.normal ) );
+
+            if( throughput < rand ){
+                B *= 0.f;
+                break;
+            }
         }
-    }
 
-    //---sample a random BxDF---
-    glm::vec3 bxdf_color( 0.f );
-    float bxdf_PDF( 0.f );
+        Ray r_bxdf( isx.point + isx.normal * 1e-4f, wiW_bxdf );
+        Intersection isx_bxdf( intersection_engine->GetIntersection( r_bxdf ) );
 
-    {
-        glm::vec3 wiW( 0.f );
-        glm::vec3 SESE( isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, -r.direction, wiW, bxdf_PDF ) );
-        glm::vec3 ray_o( isx.point + isx.normal * 1e-4f );
-        glm::vec3 ray_d( wiW );
-
-        Intersection hit( intersection_engine->GetIntersection( Ray( ray_o, ray_d ) ) );
-
-        if( hit.object_hit == NULL ) return glm::vec3( .5f );
-
-        if( hit.object_hit != NULL && hit.object_hit->material->is_light_source ){
-
-            glm::vec3 wo( glm::normalize( hit.point - isx.point ) );
-
-            bxdf_color = 1.f
-                    //---BRDF---
-                    * hit.object_hit->material->EvaluateScatteredEnergy( hit, glm::vec3( 0.f ), -wo )
-                    //---L---
-                    * SESE
-                    //---lambertian term---
-                    * fabsf( glm::dot( isx.normal, wo ) )
-                    //---ray PDF---
-                    / bxdf_PDF
-                    ;
+        if( isx_bxdf.object_hit == NULL
+                || isx_bxdf.object_hit->material->is_light_source
+                || pdf_bxdf < 1e-4f ){
+            B *= 0.f;
+            break;
+        }else{
+            Li = bxdf * fabsf( glm::dot( isx.normal, isx_bxdf.point - isx.point ) );
         }
+
+        B *= Li;
+        r = r_bxdf;
+        isx = isx_bxdf;
     }
 
-    //---combine color using power heuristic---
-    float light_PH( PowerHeuristic( 1, light_PDF, 1, bxdf_PDF ) );
-    float bxdf_PH( PowerHeuristic( 1, bxdf_PDF, 1, light_PDF ) );
-
-    return light_PH * light_color + bxdf_PH * bxdf_color;
+    return A;
 }
-
-glm::vec3 GlobalLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::vec3 &d, const Geometry *pLight ){
-
-    static const glm::vec3 white( 1.f );
-    static const glm::vec3 black( 0.f );
-    static const glm::vec3 red( 1.f, 0.f, 0.f );
-    static const glm::vec3 green( 0.f, 1.f, 0.f );
-
-    Ray ray( o, d - o );
-    QList< Intersection > isxes( intersection_engine->GetAllIntersections( ray ) );
-
-    for( const Intersection &isx : isxes ){
-        //---null intersection---
-        if( isx.object_hit == NULL ) return red;
-        //---non-light intersection---
-        if( isx.object_hit->material->is_light_source == false ) return black;
-        //---unwanted light intersection---
-        if( isx.object_hit != pLight ) continue;
-        //---wanted light intersection---
-        else return white;
-    }
-
-    //---impossible---
-    return green;
-}
-

@@ -20,7 +20,7 @@ DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEn
 
 }
 
-glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
+glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
     static const glm::vec3 black( 0.f );
 
@@ -42,6 +42,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
 
     if( flag & 1 ){
         float rand( distribution( generator ) );
+        while( rand >= .99f ) rand = distribution( generator );
         int nLights( scene->lights.size() );
         int iLight( rand * nLights );
 
@@ -63,7 +64,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r ){
                 //---BRDF---
                 * isx.object_hit->material->EvaluateScatteredEnergy( isx, woW, wiW )
                 //---L---
-                * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -woW )
+                * pLight->material->EvaluateScatteredEnergy( sample, glm::vec3( 0.f ), -wiW )
                 //---shadow---
                 * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
                 //---cosin term---

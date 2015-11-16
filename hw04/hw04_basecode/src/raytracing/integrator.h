@@ -17,7 +17,7 @@ class Integrator
 public:
     Integrator();
     Integrator(Scene *s);
-    glm::vec3 TraceRay(Ray r, unsigned int depth);
+    glm::vec3 TraceRay(Ray r, unsigned int depth );
     void SetDepth(unsigned int depth);
 
     Scene* scene;
