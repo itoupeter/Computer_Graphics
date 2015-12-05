@@ -1,5 +1,6 @@
 #include "raytracing/directlightingintegrator.h"
 #include "raytracing/globallightingintegrator.h"
+#include "raytracing/bidirectionalpathtracinghelper.h"
 
 GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
     Integrator(){
@@ -23,6 +24,7 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
     //---global lighting---
     static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
+    static BidirectionalPathTracingHelper bidirectionalPTHelper( scene, intersection_engine );
     glm::vec3 A( 0.f ), B( 1.f );
     float throughput( 1.f );
 
@@ -32,7 +34,6 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
         //---direct lighting---
         Ld = directLightingIntegrator.TraceRay( r, depth );
-        A += B * Ld;
 
         //---indirect lighting---
         float pdf_bxdf( 0.f );
@@ -40,8 +41,7 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
         glm::vec3 bxdf( isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, -r.direction, wiW_bxdf, pdf_bxdf ) );
 
         //---Russian Roulette---
-        //---meanwhile increament depth---
-        if( depth++ > 2 ){
+        if( depth > 2 ){
 
             float tmp( glm::max( bxdf.x, glm::max( bxdf.y, bxdf.z ) ) );
             float rand( distribution( generator ) );
@@ -49,10 +49,12 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
             throughput *= tmp * fabsf( glm::dot( wiW_bxdf, isx.normal ) );
 
             if( throughput < rand ){
-                B *= 0.f;
+                A += B * Ld / rand;
                 break;
             }
         }
+
+        A += B * Ld;
 
         //---pass Russian Roulette test, keep on tracing---
         Ray r_bxdf( isx.point + isx.normal * 1e-4f, wiW_bxdf );
@@ -61,15 +63,17 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
         if( isx_bxdf.object_hit == NULL
                 || isx_bxdf.object_hit->material->is_light_source
                 || pdf_bxdf < 1e-3f ){
-            B *= 0.f;
+            //---hit nothing, or light, or PDF too small---
             break;
         }else{
             Li = bxdf * fabsf( glm::dot( isx.normal, isx_bxdf.point - isx.point ) );
+            B *= Li;
         }
 
-        B *= Li;
+        //---iterate---
         r = r_bxdf;
         isx = isx_bxdf;
+        ++depth;
     }
 
     return A;

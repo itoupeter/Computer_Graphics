@@ -5,7 +5,10 @@ BidirectionalPathTracingHelper::BidirectionalPathTracingHelper():
     BidirectionalPathTracingHelper( NULL, NULL ){
 }
 
-BidirectionalPathTracingHelper::BidirectionalPathTracingHelper( Scene *scene, IntersectionEngine *intersection_engine ){
+BidirectionalPathTracingHelper::BidirectionalPathTracingHelper(
+        Scene *scene,
+        IntersectionEngine *intersection_engine ){
+
     this->scene = scene;
     this->intersection_engine = intersection_engine;
 }
@@ -30,7 +33,7 @@ void BidirectionalPathTracingHelper::generatePath(
     Intersection isx( pLight->SampleLight( rand1, rand2, rand3 ) );
 
     //---generate path vertices---
-    while( depth++ < max_depth ){
+    while( depth < max_depth ){
 
         //---sample direction from current vertex---
         isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, glm::vec3( 0.f ), wiW, PDF );
@@ -52,21 +55,27 @@ void BidirectionalPathTracingHelper::generatePath(
         //---hit object---
         path_vertices.push_back( isx_new );
 
-        if( depth == 1 ){
-
-            glm::vec3 f( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
+        if( depth == 0 ){
+            //---first vertex, direct lighting---
+            glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
             glm::vec3 Ld( pLight->material->EvaluateScatteredEnergy( isx, glm::vec3( 0.f ), wiW ) );
-            float light_pdf( pLight->RayPDF( isx_new, Ray( isx_new.point, isx.point - isx_new.point ) ) );
+            float absdot( fabsf( glm::dot( isx.normal, glm::normalize( wiW ) ) ) );
+            float light_pdf( pLight->RayPDF( isx, Ray( isx_new.point, isx.point - isx_new.point ) ) );
 
-            path_weights.push_back( f * Ld / light_pdf );
+            path_weights.push_back( bxdf * Ld * absdot / light_pdf );
 
         }else{
-
-            glm::vec3 f( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
+            //---not first vertex, indirect lighting---
+            glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
             glm::vec3 Li( path_weights[ path_weights.size() - 2 ] );
+            float absdot( fabsf( glm::dot( isx.normal, glm::normalize( wiW ) ) ) );
 
-            path_weights.push_back( f * Li * fabsf( glm::dot( isx.normal, glm::normalize( wiW ) ) ) );
+            path_weights.push_back( bxdf * Li * absdot );
         }
+
+        //---iterate---
+        isx = isx_new;
+        ++depth;
     }
 
 }
