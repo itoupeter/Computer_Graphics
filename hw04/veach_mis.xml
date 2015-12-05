@@ -149,6 +149,6 @@
 		<maxDepth>2</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>2</pixelSampleLength>
+	<pixelSampleLength>10</pixelSampleLength>
 
 </scene>
