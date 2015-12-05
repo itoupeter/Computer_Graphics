@@ -28,10 +28,10 @@ void Integrator::SetDepth(unsigned int depth)
 glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
 
     //---direct lighting---
-//    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
-//    return directLightingIntegrator.TraceRay( r, depth );
+    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
+    return directLightingIntegrator.TraceRay( r, depth );
 
     //---global lighting---
-    static GlobalLightingIntegrator globalLightingIntegrator( scene, intersection_engine );
-    return globalLightingIntegrator.TraceRay( r, depth );
+//    static GlobalLightingIntegrator globalLightingIntegrator( scene, intersection_engine );
+//    return globalLightingIntegrator.TraceRay( r, depth );
 }

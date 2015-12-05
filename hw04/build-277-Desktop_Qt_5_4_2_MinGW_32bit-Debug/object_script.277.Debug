@@ -34,6 +34,7 @@ INPUT(
 ./debug\blinnmicrofacetbxdf.o
 ./debug\specularreflectionbxdf.o
 ./debug\globallightingintegrator.o
+./debug\bidirectionalpathtracinghelper.o
 ./debug\qrc_glsl.o
 ./debug\moc_mainwindow.o
 ./debug\moc_mygl.o

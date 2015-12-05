@@ -34,7 +34,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
     if( isx.object_hit->material->is_light_source )
         return isx.texture_color * isx.object_hit->material->base_color;
 
-    int flag( 3 );
+    int flag( 1 );
 
     //---sample a random light---
     glm::vec3 light_color( 0.f );

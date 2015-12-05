@@ -34,6 +34,7 @@ INPUT(
 ./release\blinnmicrofacetbxdf.o
 ./release\specularreflectionbxdf.o
 ./release\globallightingintegrator.o
+./release\bidirectionalpathtracinghelper.o
 ./release\qrc_glsl.o
 ./release\moc_mainwindow.o
 ./release\moc_mygl.o

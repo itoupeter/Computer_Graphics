@@ -1,0 +1,50 @@
+body{font-family:Arial CE, Arial, Times New Roman CE, Times New Roman; font-size: 12px; width:900px; background-color:#DDDDDD}
+
+H1 {text-align:center; font-weight:bold; font-size:24pt; margin-bottom:-10px; margin-top:20px;}
+H2 {text-align:center; font-size:14pt; margin-top:5px; margin-bottom:10px;}
+H3 {text-align:left; margin-left:70px; margin-bottom:3px; font-weight:bold; font-size:12pt;}
+
+IMG {margin-left: 50px; margin-right:50px; margin-top: 5px; margin-bottom:5px;}	
+P {margin-left: 50px; margin-right:50px;}
+
+A IMG {border: solid 1px transparent;}
+A IMG:hover{border: solid 1px #111111;}
+
+UL {margin-left:50px;text-align:left;}
+LI {margin-left:50px;text-align:left;}
+
+/* divs */
+
+#divPage {margin-left:0;}
+#divSampleImages {}
+#divSourceCode {/*background-color:Gray;*/padding:30px;width:900px;}
+#divSourceCodeInner {background-color:Silver; border: solid 1px Gray; width:840px;padding:20px;}
+#divReferences {font-family:Arial CE, Arial, Times New Roman CE, Times New Roman; font-size: 12px;}
+#divReferences LI {margin-left:0;text-align:left;}
+
+/**** spans *****/
+H2 #spanNames { /*font-style:italic;*/ font-size:14px; font-weight:bold;}
+#SourceCodeTitleSpan {text-align:left;font-weight:bold; font-size:14pt; margin-bottom:-10px; margin-left:50px}
+#spanReferences {text-align:left;font-weight:bold; font-size:14pt; margin-bottom:-10px; margin-left:50px;}
+
+/**** menu ***/
+#menuTitle {font-weight:bold; font-size:14px; display: block; text-align: center;color: Black; height: 2.5em;}
+#nav-menu {float:left}
+#nav-menu ul {list-style: none; padding: 0 ;margin: 0;} 
+#nav-menu li {margin: 0 0.15em;} 
+#nav-menu li a
+{
+	background-color: #777777;
+	height: 2em;
+	line-height: 2em;
+	/*float: left;*/
+	width: 160px;
+	display: block;
+	border: 1px solid #dcdce9;
+	color: White;
+	text-decoration: none;
+	text-align: center;
+} 
+#nav-menu li a:hover{background-color: #555555;}
+.divClear {clear:both;}
+
