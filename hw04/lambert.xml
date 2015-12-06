@@ -128,7 +128,7 @@
 	</bxdf>
 
 	<integrator type="raytrace">
-		<maxDepth>5</maxDepth>
+		<maxDepth>2</maxDepth>
 	</integrator>
 
 	<pixelSampleLength>2</pixelSampleLength>

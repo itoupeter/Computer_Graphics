@@ -12,12 +12,12 @@ float PowerHeuristic( int nf, float fPDF, int ng, float gPDF ){
 
 const int DirectLightingIntegrator::N = 4;
 
-DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
+DirectLightingIntegrator::DirectLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine, int max_depth ):
     Integrator(){
 
     this->scene = scene;
     this->intersection_engine = intersection_engine;
-
+    SetDepth( max_depth );
 }
 
 glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){

@@ -3,10 +3,10 @@
 #include <raytracing/globallightingintegrator.h>
 
 Integrator::Integrator():
-    max_depth(5){
+    max_depth(5),
+    scene( NULL ),
+    intersection_engine( NULL ){
 
-    scene = NULL;
-    intersection_engine = NULL;
 }
 
 Integrator::Integrator( Scene *s ):
@@ -29,11 +29,11 @@ glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
 
 #ifndef GLOBAL_ILLUMINATION
     //---direct lighting---
-    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
+    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine, max_depth );
     return directLightingIntegrator.TraceRay( r, depth );
 #else
     //---global lighting---
-    static GlobalLightingIntegrator globalLightingIntegrator( scene, intersection_engine );
+    static GlobalLightingIntegrator globalLightingIntegrator( scene, intersection_engine, max_depth );
     return globalLightingIntegrator.TraceRay( r, depth );
 #endif
 }

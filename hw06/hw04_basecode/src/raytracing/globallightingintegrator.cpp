@@ -2,11 +2,12 @@
 #include "raytracing/globallightingintegrator.h"
 #include "raytracing/bidirectionalpathtracinghelper.h"
 
-GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine ):
+GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine, int max_depth ):
     Integrator(){
 
     this->scene = scene;
     this->intersection_engine = intersection_engine;
+    SetDepth( 1 );
 }
 
 glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
@@ -23,7 +24,7 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
         return isx.object_hit->material->base_color * isx.texture_color;
 
     //---global lighting---
-    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine );
+    static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine, max_depth );
     static BidirectionalPathTracingHelper bidirectionalPTHelper( scene, intersection_engine );
     glm::vec3 A( 0.f ), B( 1.f );
     float throughput( 1.f );
@@ -51,6 +52,8 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
             Lb += path_weights[ i ] * fabsf( glm::dot( wiW_nxt, isx.normal ) );
         }
+
+        return Lb;
 
         //---indirect lighting---
         float pdf_bxdf( 0.f );
