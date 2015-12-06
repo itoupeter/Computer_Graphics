@@ -117,7 +117,7 @@
 		<bxdf>specular1</bxdf><weight>0.5</weight>
 	</material>
 
-	<material type="light" name="emissive_material" intensity="10">
+	<material type="light" name="emissive_material" intensity="50">
 		<baseColor>1 1 1</baseColor>
 	</material>
 

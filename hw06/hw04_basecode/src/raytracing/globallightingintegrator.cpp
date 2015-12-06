@@ -36,21 +36,21 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
         Ld = directLightingIntegrator.TraceRay( r, depth );
 
         //---bidirectional indirect lighting---
-//        vector< Intersection > path_vertices;
-//        vector< glm::vec3 > path_weights;
+        vector< Intersection > path_vertices;
+        vector< glm::vec3 > path_weights;
 
-//        bidirectionalPTHelper.generatePath( path_vertices, path_weights, max_depth );
-//        assert( path_vertices.size() == path_weights.size() );
+        bidirectionalPTHelper.generatePath( path_vertices, path_weights, max_depth );
+        assert( path_vertices.size() == path_weights.size() );
 
-//        for( int i = 0; i < path_vertices.size(); ++i ){
+        for( int i = 0; i < path_vertices.size(); ++i ){
 
-//            Intersection &isx_nxt = path_vertices[ i ];
-//            glm::vec3 wiW_nxt( glm::normalize( isx_nxt.point - isx.point ) );
+            Intersection &isx_nxt = path_vertices[ i ];
+            glm::vec3 wiW_nxt( glm::normalize( isx_nxt.point - isx.point ) );
 
-//            if( !Visible( isx, isx_nxt ) ) continue;
+            if( !Visible( isx, isx_nxt ) ) continue;
 
-//            Lb += path_weights[ i ] * fabsf( glm::dot( wiW_nxt, isx.normal ) );
-//        }
+            Lb += path_weights[ i ] * fabsf( glm::dot( wiW_nxt, isx.normal ) );
+        }
 
         //---indirect lighting---
         float pdf_bxdf( 0.f );
@@ -106,8 +106,6 @@ bool GlobalLightingIntegrator::Visible( const Intersection &a, const Intersectio
 //    return isx.object_hit == b.object_hit;
 
     QList< Intersection > isxes( intersection_engine->GetAllIntersections( ray ) );
-
-    assert( isxes.size() > 0 );
 
     for( Intersection isx : isxes ){
         if( isx.object_hit == NULL ) continue;
