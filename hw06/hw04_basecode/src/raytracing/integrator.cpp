@@ -25,15 +25,18 @@ void Integrator::SetDepth( unsigned int depth ){
 
 glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
 
-#define GLOBAL_ILLUMINATION
+#define INTEGRATOR 1
 
-#ifndef GLOBAL_ILLUMINATION
+#if INTEGRATOR == 0
     //---direct lighting---
     static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine, max_depth );
     return directLightingIntegrator.TraceRay( r, depth );
-#else
+#elif INTEGRATOR == 1
     //---global lighting---
     static GlobalLightingIntegrator globalLightingIntegrator( scene, intersection_engine, max_depth );
     return globalLightingIntegrator.TraceRay( r, depth );
+#elif INTEGRATOR == 2
+    //---bidirectional path tracing---
+
 #endif
 }

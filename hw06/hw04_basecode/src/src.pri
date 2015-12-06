@@ -38,7 +38,8 @@ SOURCES += \
     $$PWD/scene/materials/bxdfs/blinnmicrofacetbxdf.cpp \
     $$PWD/scene/materials/bxdfs/specularreflectionbxdf.cpp \
     $$PWD/raytracing/globallightingintegrator.cpp \
-    $$PWD/raytracing/bidirectionalpathtracinghelper.cpp
+    $$PWD/raytracing/bidirectionalpathtracinghelper.cpp \
+    $$PWD/raytracing/bidirectionalpathtracingintegrator.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -82,4 +83,5 @@ HEADERS += \
     $$PWD/scene/materials/bxdfs/blinnmicrofacetbxdf.h \
     $$PWD/scene/materials/bxdfs/specularreflectionbxdf.h \
     $$PWD/raytracing/globallightingintegrator.h \
-    $$PWD/raytracing/bidirectionalpathtracinghelper.h
+    $$PWD/raytracing/bidirectionalpathtracinghelper.h \
+    $$PWD/raytracing/bidirectionalpathtracingintegrator.h

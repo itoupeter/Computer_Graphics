@@ -85,7 +85,7 @@
 			<rotate>0 0 0</rotate>
 			<scale>4 .1 4</scale>
 		</transform>
-		<material>red_diffuse</material>
+		<material>white_diffuse</material>
 	</geometry>
 
 	<material type="default" name="white_diffuse">
@@ -140,6 +140,6 @@
 		<maxDepth>5</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>2</pixelSampleLength>
+	<pixelSampleLength>3</pixelSampleLength>
 
 </scene>

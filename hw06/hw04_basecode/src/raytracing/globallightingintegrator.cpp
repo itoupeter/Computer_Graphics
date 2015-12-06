@@ -7,7 +7,7 @@ GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEn
 
     this->scene = scene;
     this->intersection_engine = intersection_engine;
-    SetDepth( 1 );
+    SetDepth( max_depth );
 }
 
 glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
@@ -31,11 +31,14 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
     while( depth < max_depth ){
 
-        glm::vec3 Li( 0.f ), Ld( 0.f ), Lb( 0.f );
+        glm::vec3 Li( 0.f ), Ld( 0.f );
 
         //---direct lighting---
         Ld = directLightingIntegrator.TraceRay( r, depth );
 
+//#define BIDIRECTIONAL
+
+#ifdef BIDIRECTIONAL
         //---bidirectional indirect lighting---
         vector< Intersection > path_vertices;
         vector< glm::vec3 > path_weights;
@@ -50,10 +53,15 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
             if( !Visible( isx, isx_nxt ) ) continue;
 
-            Lb += path_weights[ i ] * fabsf( glm::dot( wiW_nxt, isx.normal ) );
+            Lb += 1.f / ( i + depth + 2.f )
+                    //---L---
+                    * path_weights[ i ]
+                    //---BxDF---
+                    * isx.object_hit->material->EvaluateScatteredEnergy( isx, -r.direction, wiW_nxt )
+                    //---absdot---
+                    * fabsf( glm::dot( -r.direction, isx.normal ) );
         }
-
-        return Lb;
+#endif
 
         //---indirect lighting---
         float pdf_bxdf( 0.f );
@@ -69,12 +77,10 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
             throughput *= tmp * fabsf( glm::dot( wiW_bxdf, isx.normal ) );
 
             if( throughput < rand ){
-//                A += B * Ld / rand;
+                A += B * Ld / rand;
                 break;
             }
         }
-
-        A += B * ( Ld + Lb );
 
         //---pass Russian Roulette test, keep on tracing---
         Ray r_bxdf( isx.point + isx.normal * 1e-4f, wiW_bxdf );
@@ -86,9 +92,11 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
             //---hit nothing, or light, or PDF too small---
             break;
         }else{
-            Li = bxdf * fabsf( glm::dot( isx.normal, wiW_bxdf ) );
+            Li = bxdf * fabsf( glm::dot( isx.normal, wiW_bxdf ) ) / pdf_bxdf;
             B *= Li;
         }
+
+        A += B * Ld;
 
         //---iterate---
         isx = isx_bxdf;
@@ -97,25 +105,4 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
     }
 
     return A;
-}
-
-bool GlobalLightingIntegrator::Visible( const Intersection &a, const Intersection &b ){
-
-    glm::vec3 ray_o( a.point + a.normal * 1e-3f );
-    glm::vec3 ray_d( b.point - a.point );
-    Ray ray( ray_o, ray_d );
-
-//    Intersection isx( intersection_engine->GetIntersection( ray ) );
-//    return isx.object_hit == b.object_hit;
-
-    QList< Intersection > isxes( intersection_engine->GetAllIntersections( ray ) );
-
-    for( Intersection isx : isxes ){
-        if( isx.object_hit == NULL ) continue;
-        if( isx.object_hit->material->is_light_source ) continue;
-        if( isx.object_hit != b.object_hit ) return false;
-        if( glm::distance2( isx.point, b.point ) > 1e-2f ) return false;
-    }
-
-    return true;
 }

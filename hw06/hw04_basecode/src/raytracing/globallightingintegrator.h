@@ -9,7 +9,6 @@ public:
 
 //    glm::vec3 ShadowTest( const glm::vec3 &o, const glm::vec3 &d, const Geometry *pLight );
     glm::vec3 TraceRay( Ray r, unsigned int depth );
-    bool Visible( const Intersection &a, const Intersection &b );
 };
 
 #endif // GLOBALLIGHTINGINTEGRATOR_H

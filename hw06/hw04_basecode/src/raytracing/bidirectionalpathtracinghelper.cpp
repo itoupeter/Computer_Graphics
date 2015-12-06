@@ -1,4 +1,5 @@
 
+#include "directlightingintegrator.h"
 #include "bidirectionalpathtracinghelper.h"
 
 BidirectionalPathTracingHelper::BidirectionalPathTracingHelper():
@@ -27,10 +28,10 @@ void BidirectionalPathTracingHelper::generatePath(
     glm::vec3 wiW( 0.f );
 
     //---pick a light---
-    float rand0( distribution( generator ) );
-    while( rand0 > 0.99f ) rand0 = distribution( generator );
-    int light_idx( ( int )( scene->lights.size() * rand0 ) );
-    Geometry *pLight( scene->lights[ light_idx ] );
+//    float rand0( distribution( generator ) );
+//    while( rand0 > 0.99f ) rand0 = distribution( generator );
+//    int light_idx( ( int )( scene->lights.size() * rand0 ) );
+    Geometry *pLight( scene->lights.front() );
 
     //---initial vertex on the light---
     float rand1( distribution( generator ) );
@@ -48,7 +49,7 @@ void BidirectionalPathTracingHelper::generatePath(
         Ray ray( isx.point + isx.normal * 1e-4f, wiW );
         Intersection isx_new( intersection_engine->GetIntersection( ray ) );
         glm::vec3 wiW_new( 0.f );
-        float PDF_new( 0.f );
+        float pdf_bxdf( 0.f );
 
         if( isx_new.object_hit == NULL ){
             //---hit nothing---
@@ -62,17 +63,17 @@ void BidirectionalPathTracingHelper::generatePath(
         path_vertices.push_back( isx_new );
 
         if( depth == 0 ){
-            //---first vertex, direct lighting---
-            glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
+            //---first vertex, direct lighting only---
+            glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, pdf_bxdf ) );
             glm::vec3 Ld( pLight->material->EvaluateScatteredEnergy( isx, glm::vec3( 0.f ), wiW ) );
             float absdot( fabsf( glm::dot( isx.normal, -wiW ) ) );
-            float light_pdf( pLight->RayPDF( isx, Ray( isx_new.point, isx.point - isx_new.point ) ) );
+            float pdf_light( pLight->RayPDF( isx, Ray( isx_new.point, isx.point - isx_new.point ) ) );
 
-            path_weights.push_back( bxdf * Ld * absdot / light_pdf );
+            path_weights.push_back( bxdf * Ld * absdot / pdf_light );
 
         }else{
-            //---not first vertex, indirect lighting---
-            glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
+            //---not first vertex, balanced direct and indirect lighting---
+            glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, pdf_bxdf ) );
             glm::vec3 Li( path_weights[ path_weights.size() - 2 ] );
             float absdot( fabsf( glm::dot( isx.normal, -wiW ) ) );
 
