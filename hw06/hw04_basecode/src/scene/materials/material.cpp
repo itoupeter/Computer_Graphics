@@ -71,7 +71,7 @@ glm::vec3 Material::SampleAndEvaluateScatteredEnergy(const Intersection &isx, co
                      * isx.object_hit->material->base_color
                      * isx.texture_color );
 
-    wiW_ret = t2w * wi;
+    wiW_ret = glm::normalize( t2w * wi );
     pdf_ret = PDF;
 
     return color;

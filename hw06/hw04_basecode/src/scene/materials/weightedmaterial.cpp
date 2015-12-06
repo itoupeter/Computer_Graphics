@@ -81,7 +81,7 @@ glm::vec3 WeightedMaterial::SampleAndEvaluateScatteredEnergy(const Intersection 
             color = bxdfs[ iBxDF ]->SampleAndEvaluateScatteredEnergy( wo, wi_ret, rand1, rand2, pdf_ret )
                     * isx.object_hit->material->base_color
                     * isx.texture_color;
-            wiW_ret = t2w * wi_ret;
+            wiW_ret = glm::normalize( t2w * wi_ret );
             break;
         }else{
             rand0 -= weight;

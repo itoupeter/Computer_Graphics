@@ -12,18 +12,18 @@ float UniformConePdf( float cosThetaMax ){
     return 1.f / ( 2.f * PI * ( 1.f - cosThetaMax ) );
 }
 
-float Sphere::RayPDF(const Intersection &isx, const Ray &ray) {
-    glm::vec3 Pcenter = transform.position();
-    float radius = 0.5f * ( transform.getScale().x + transform.getScale().y + transform.getScale().z ) / 3.0f;
-    // Return uniform weight if point inside sphere
-    if (glm::distance2(isx.point, Pcenter) - radius*radius < 1e-4f)
-        return Geometry::RayPDF(isx, ray);
+//float Sphere::RayPDF(const Intersection &isx, const Ray &ray) {
+//    glm::vec3 Pcenter = transform.position();
+//    float radius = 0.5f * ( transform.getScale().x + transform.getScale().y + transform.getScale().z ) / 3.0f;
+//    // Return uniform weight if point inside sphere
+//    if (glm::distance2(isx.point, Pcenter) - radius*radius < 1e-4f)
+//        return Geometry::RayPDF(isx, ray);
 
-    // Compute general sphere weight
-    float sinThetaMax2 = radius*radius / glm::distance2(isx.point, Pcenter);
-    float cosThetaMax = glm::sqrt(fmaxf(0.f, 1.f - sinThetaMax2));
-    return UniformConePdf(cosThetaMax);
-}
+//    // Compute general sphere weight
+//    float sinThetaMax2 = radius*radius / glm::distance2(isx.point, Pcenter);
+//    float cosThetaMax = glm::sqrt(fmaxf(0.f, 1.f - sinThetaMax2));
+//    return UniformConePdf(cosThetaMax);
+//}
 
 void Sphere::ComputeArea()
 {

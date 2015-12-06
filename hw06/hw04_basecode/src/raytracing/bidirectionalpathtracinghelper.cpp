@@ -16,7 +16,7 @@ BidirectionalPathTracingHelper::BidirectionalPathTracingHelper(
 void BidirectionalPathTracingHelper::generatePath(
         vector< Intersection > &path_vertices,
         vector< glm::vec3 > &path_weights,
-        Geometry *pLight, int max_depth ){
+        int max_depth ){
 
     //---initialization---
     path_vertices.clear();
@@ -25,6 +25,12 @@ void BidirectionalPathTracingHelper::generatePath(
     int depth( 0 );
     float PDF( 0.f );
     glm::vec3 wiW( 0.f );
+
+    //---pick a light---
+    float rand0( distribution( generator ) );
+    while( rand0 > 0.99f ) rand0 = distribution( generator );
+    int light_idx( ( int )( scene->lights.size() * rand0 ) );
+    Geometry *pLight( scene->lights[ light_idx ] );
 
     //---initial vertex on the light---
     float rand1( distribution( generator ) );
@@ -59,7 +65,7 @@ void BidirectionalPathTracingHelper::generatePath(
             //---first vertex, direct lighting---
             glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
             glm::vec3 Ld( pLight->material->EvaluateScatteredEnergy( isx, glm::vec3( 0.f ), wiW ) );
-            float absdot( fabsf( glm::dot( isx.normal, glm::normalize( wiW ) ) ) );
+            float absdot( fabsf( glm::dot( isx.normal, -wiW ) ) );
             float light_pdf( pLight->RayPDF( isx, Ray( isx_new.point, isx.point - isx_new.point ) ) );
 
             path_weights.push_back( bxdf * Ld * absdot / light_pdf );
@@ -68,7 +74,7 @@ void BidirectionalPathTracingHelper::generatePath(
             //---not first vertex, indirect lighting---
             glm::vec3 bxdf( isx_new.object_hit->material->SampleAndEvaluateScatteredEnergy( isx_new, -wiW, wiW_new, PDF_new ) );
             glm::vec3 Li( path_weights[ path_weights.size() - 2 ] );
-            float absdot( fabsf( glm::dot( isx.normal, glm::normalize( wiW ) ) ) );
+            float absdot( fabsf( glm::dot( isx.normal, -wiW ) ) );
 
             path_weights.push_back( bxdf * Li * absdot );
         }
@@ -77,5 +83,4 @@ void BidirectionalPathTracingHelper::generatePath(
         isx = isx_new;
         ++depth;
     }
-
 }

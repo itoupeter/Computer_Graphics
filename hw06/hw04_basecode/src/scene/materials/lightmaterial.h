@@ -10,4 +10,9 @@ public:
     //Given an intersection with some geometry, generate a point on the geometry to which this material is applied and
     //
     glm::vec3 SampleLight(const Intersection &geom_isx, glm::vec3 &wi_ret, float &light_pdf_ret, bool &visibility_ret) const;
+
+    //---
+    //---sample direction only---
+    glm::vec3 SampleAndEvaluateScatteredEnergy(const Intersection &isx, const glm::vec3 &woW, glm::vec3 &wiW_ret, float &pdf_ret, BxDFType flags = BSDF_ALL) const;
+    //---
 };

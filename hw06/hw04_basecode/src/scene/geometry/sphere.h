@@ -14,7 +14,7 @@ public:
 
     virtual void ComputeArea();
 
-    float RayPDF(const Intersection &isx, const Ray &ray);
+//    float RayPDF(const Intersection &isx, const Ray &ray);
 
     virtual Intersection SampleLight( float a, float b, float c );
 };

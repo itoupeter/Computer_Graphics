@@ -68,7 +68,7 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
                 //---shadow---
                 * ShadowTest( isx.point + isx.normal * 1e-4f, sample.point, pLight )
                 //---cosin term---
-                * fabsf( glm::dot( isx.normal, woW ) )
+                * fabsf( glm::dot( isx.normal, wiW ) )
                 //---ray PDF---
                 / light_PDF
                 ;
@@ -84,22 +84,20 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
     if( flag & 2 ){
         glm::vec3 wiW( 0.f );
         glm::vec3 SESE( isx.object_hit->material->SampleAndEvaluateScatteredEnergy( isx, -r.direction, wiW, bxdf_PDF ) );
-        glm::vec3 ray_o( isx.point + isx.normal * 1e-4f );
+        glm::vec3 ray_o( isx.point + isx.normal * 1e-3f );
         glm::vec3 ray_d( wiW );
 
         Intersection hit( intersection_engine->GetIntersection( Ray( ray_o, ray_d ) ) );
 
         if( hit.object_hit != NULL && hit.object_hit->material->is_light_source ){
-
-            glm::vec3 woW( glm::normalize( hit.point - isx.point ) );
-
+            wiW = glm::normalize( wiW );
             bxdf_color = 1.f
                     //---BRDF---
-                    * hit.object_hit->material->EvaluateScatteredEnergy( hit, glm::vec3( 0.f ), -woW )
+                    * hit.object_hit->material->EvaluateScatteredEnergy( hit, glm::vec3( 0.f ), -wiW )
                     //---L---
                     * SESE
                     //---cosin term---
-                    * fabsf( glm::dot( isx.normal, woW ) )
+                    * fabsf( glm::dot( isx.normal, wiW ) )
                     //---ray PDF---
                     / bxdf_PDF
                     ;
@@ -109,10 +107,9 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
     if( flag == 2 ) return bxdf_color;
 
     //---combine color using power heuristic---
-    float light_PH( PowerHeuristic( 1, light_PDF, 1, bxdf_PDF ) );
-    float bxdf_PH( PowerHeuristic( 1, bxdf_PDF, 1, light_PDF ) );
+    float PH( PowerHeuristic( 1, light_PDF, 1, bxdf_PDF ) );
 
-    return light_PH * light_color + bxdf_PH * bxdf_color;
+    return PH * light_color + ( 1 - PH ) * bxdf_color;
 }
 
 glm::vec3 DirectLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::vec3 &d, const Geometry *pLight ){
