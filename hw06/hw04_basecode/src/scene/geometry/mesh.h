@@ -17,6 +17,9 @@ public:
 
     virtual Intersection SampleLight( float a, float b, float c );
 
+    //---bounding box in local space---
+    virtual void computeBounds();
+
     glm::vec3 points[3];
     glm::vec3 normals[3];
     glm::vec2 uvs[3];
@@ -45,6 +48,9 @@ public:
     virtual void ComputeArea();
 
     virtual Intersection SampleLight( float a, float b, float c = 0.f );
+
+    //---BVH---
+    virtual void computeBounds();
 
 private:
     QList<Triangle*> faces;

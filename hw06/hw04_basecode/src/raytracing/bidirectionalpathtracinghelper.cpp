@@ -17,6 +17,7 @@ BidirectionalPathTracingHelper::BidirectionalPathTracingHelper(
 void BidirectionalPathTracingHelper::generatePath(
         vector< Intersection > &path_vertices,
         vector< glm::vec3 > &path_weights,
+        Geometry *pLight,
         int max_depth ){
 
     //---initialization---
@@ -26,12 +27,6 @@ void BidirectionalPathTracingHelper::generatePath(
     int depth( 0 );
     float PDF( 0.f );
     glm::vec3 wiW( 0.f );
-
-    //---pick a light---
-//    float rand0( distribution( generator ) );
-//    while( rand0 > 0.99f ) rand0 = distribution( generator );
-//    int light_idx( ( int )( scene->lights.size() * rand0 ) );
-    Geometry *pLight( scene->lights.front() );
 
     //---initial vertex on the light---
     float rand1( distribution( generator ) );

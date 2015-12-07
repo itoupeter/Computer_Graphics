@@ -39,7 +39,10 @@ SOURCES += \
     $$PWD/scene/materials/bxdfs/specularreflectionbxdf.cpp \
     $$PWD/raytracing/globallightingintegrator.cpp \
     $$PWD/raytracing/bidirectionalpathtracinghelper.cpp \
-    $$PWD/raytracing/bidirectionalpathtracingintegrator.cpp
+    $$PWD/raytracing/bidirectionalpathtracingintegrator.cpp \
+    $$PWD/scene/boundingbox.cpp \
+    $$PWD/scene/bvh.cpp \
+    $$PWD/scene/bvhnode.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -84,4 +87,7 @@ HEADERS += \
     $$PWD/scene/materials/bxdfs/specularreflectionbxdf.h \
     $$PWD/raytracing/globallightingintegrator.h \
     $$PWD/raytracing/bidirectionalpathtracinghelper.h \
-    $$PWD/raytracing/bidirectionalpathtracingintegrator.h
+    $$PWD/raytracing/bidirectionalpathtracingintegrator.h \
+    $$PWD/scene/boundingbox.h \
+    $$PWD/scene/bvh.h \
+    $$PWD/scene/bvhnode.h

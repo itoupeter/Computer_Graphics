@@ -10,7 +10,9 @@
 #include <scene/materials/bxdfs/lambertBxDF.h>
 
 Scene::Scene()
-{}
+{
+    allBBoxes.clear();
+}
 
 void Scene::SetCamera(const Camera &c)
 {
@@ -66,4 +68,8 @@ void Scene::Clear()
     bxdfs.clear();
     camera = Camera();
     film = Film();
+
+    //---
+    allBBoxes.clear();
+    //---
 }

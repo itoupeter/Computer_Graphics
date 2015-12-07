@@ -62,32 +62,32 @@
 		<material>yellow_diffuse</material>
 	</geometry>
 
-	<geometry type="sphere" name="White Sphere">
+	<geometry type="sphere" name="cyan Sphere">
 		<transform>
 			<translate>-3 0 2</translate>
 			<scale>4 4 4</scale>
 		</transform>
-		<material>plastic_material</material>
+		<material>green_diffuse</material>
 	</geometry>
 
 	<geometry type="sphere" name="Light Source">
 		<transform>
-			<translate>0 4 0</translate>
+			<translate>0 4.5 0</translate>
 			<rotate>90 0 0</rotate>
-			<scale>0.5 0.5 0.5</scale>
+			<scale>1 1 1</scale>
 		</transform>
 		<material>emissive_material</material>
 	</geometry>
-	
-	<geometry type="cube" name="Blocking Slab">
+
+	<geometry type="cube" name="Block">
 		<transform>
 			<translate>0 3.5 0</translate>
 			<rotate>0 0 0</rotate>
-			<scale>4 .1 4</scale>
+			<scale>5 .1 5</scale>
 		</transform>
 		<material>white_diffuse</material>
 	</geometry>
-
+	
 	<material type="default" name="white_diffuse">
 		<baseColor>1 1 1</baseColor>
 		<bxdf>lambert1</bxdf>
@@ -137,7 +137,7 @@
 	</bxdf>
 
 	<integrator type="raytrace">
-		<maxDepth>5</maxDepth>
+		<maxDepth>2</maxDepth>
 	</integrator>
 
 	<pixelSampleLength>3</pixelSampleLength>

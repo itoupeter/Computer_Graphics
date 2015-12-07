@@ -17,6 +17,7 @@ public:
     void generatePath(
             vector< Intersection > &path_vertices,
             vector< glm::vec3 > &path_weights,
+            Geometry *pLight,
             int max_depth );
 
     Scene *scene;

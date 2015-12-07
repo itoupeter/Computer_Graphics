@@ -5,6 +5,7 @@
 #include <raytracing/samplers/pixelsampler.h>
 #include <scene/geometry/geometry.h>
 #include <scene/materials/bxdfs/bxdf.h>
+#include <scene/boundingbox.h>
 
 class Geometry;
 class Material;
@@ -21,6 +22,9 @@ public:
     Film film;
 
     unsigned int sqrt_samples;//Read by MyGL and RenderThread when making PixelSamplers
+
+    //---all bounding boxes to be drawn---
+    QList< BoundingBox * > allBBoxes;
 
     void SetCamera(const Camera &c);
 

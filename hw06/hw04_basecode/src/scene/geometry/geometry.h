@@ -6,9 +6,11 @@
 #include <raytracing/ray.h>
 #include <scene/transform.h>
 #include <math.h>
+#include <scene/boundingbox.h>
 
 class Material;
 class Intersection;
+class BoundingBox;
 
 //Geometry is an abstract class since it contains a pure virtual function (i.e. a virtual function that is set to 0)
 class Geometry : public Drawable
@@ -45,4 +47,10 @@ public:
     Transform transform;
     Material* material;
     float area;
+
+    //---BVH---
+    BoundingBox* pBBox;
+
+    virtual void computeBounds() = 0;
+    //---
 };

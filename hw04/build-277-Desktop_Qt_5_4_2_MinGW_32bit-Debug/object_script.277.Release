@@ -36,6 +36,9 @@ INPUT(
 ./release\globallightingintegrator.o
 ./release\bidirectionalpathtracinghelper.o
 ./release\bidirectionalpathtracingintegrator.o
+./release\boundingbox.o
+./release\bvh.o
+./release\bvhnode.o
 ./release\qrc_glsl.o
 ./release\moc_mainwindow.o
 ./release\moc_mygl.o

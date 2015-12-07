@@ -17,6 +17,10 @@ Intersection Triangle::SampleLight( float a, float b, float c ){
     return Intersection();
 }
 
+void Triangle::computeBounds(){
+
+}
+
 void Mesh::ComputeArea()
 {
     //Extra credit to implement this
@@ -36,6 +40,53 @@ void Mesh::ComputeArea()
         area += .5f * glm::length( glm::cross( v01, v02 ) );
         areas_prefix.push_back( area );
     }
+}
+
+void Mesh::computeBounds(){
+
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( Triangle *triangle : faces ){
+
+        //---transform vertices to the world space---
+        glm::vec4 vertices_in_world[]{
+            transform.T() * glm::vec4( triangle->points[ 0 ], 1.f ),
+            transform.T() * glm::vec4( triangle->points[ 1 ], 1.f ),
+            transform.T() * glm::vec4( triangle->points[ 2 ], 1.f ),
+        };
+
+        //---decide bounds---
+        glm::vec3 max_bound_tri_w( -1e6f );
+        glm::vec3 min_bound_tri_w( 1e6f );
+//        glm::vec3 max_bound_tri_l( -1e6f );
+//        glm::vec3 min_bound_tri_l( 1e6f );
+
+        for( int i = 0; i < 3; ++i ){
+            max_bound_tri_w = glm::max( max_bound_tri_w, glm::vec3( vertices_in_world[ i ] ) );
+            min_bound_tri_w = glm::min( min_bound_tri_w, glm::vec3( vertices_in_world[ i ] ) );
+//            max_bound_tri_l = glm::max( max_bound_tri_l, glm::vec3( triangle->points[ i ] ) );
+//            min_bound_tri_l = glm::min( min_bound_tri_l, glm::vec3( triangle->points[ i ] ) );
+        }
+
+        //---cast Triangle* to Geometry* and save to pFaces---
+//        gFaces.push_back( static_cast< Geometry * >( triangle ) );
+
+        //---save bounding box of current triangle in world space---
+//        triangle->pBBox = new BoundingBox( max_bound_tri_w, min_bound_tri_w );
+
+        //---save bounding box of current triangle in mesh space---
+//        triangle->pBBoxInLocal = new BoundingBox( max_bound_tri_l, min_bound_tri_l );
+
+        //---calculate mesh bounding box in world space---
+        max_bound = glm::max( max_bound, max_bound_tri_w );
+        min_bound = glm::min( min_bound, min_bound_tri_w );
+    }
+
+    pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( .1f ) );
+
+    //---build BVH for mesh---
+//    root = BVH::mesh_build( gFaces, root, 0 );
 }
 
 int bisect_find( QList< float > &list, float c ){

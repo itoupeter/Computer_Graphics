@@ -101,7 +101,7 @@
 
 	<material type="default" name="textured_diffuse">
 		<baseColor>1 1 1</baseColor>
-		<texture>tex_nor_maps/165.jpg</texture>
+		<_texture>tex_nor_maps/165.jpg</_texture>
 		<normalMap>tex_nor_maps/165_norm.jpg</normalMap>
 		<bxdf>lambert1</bxdf>
 	</material>
@@ -128,9 +128,9 @@
 	</bxdf>
 
 	<integrator type="raytrace">
-		<maxDepth>2</maxDepth>
+		<maxDepth>5</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>4</pixelSampleLength>
+	<pixelSampleLength>2</pixelSampleLength>
 
 </scene>

@@ -73,12 +73,35 @@ Intersection Sphere::SampleLight( float a, float b, float c ){
     float y( sqrt( 1 - u * u ) * sinf( theta ) );
     float z( u );
 
-    glm::vec3 ray_o( x, y, z );
+    glm::vec3 ray_o( x * .6f, y * .6f, z * .6f );
     glm::vec3 ray_d( -x, -y, -z );
 
     Ray ray( ray_o, ray_d );
 
     return GetIntersection( ray.GetTransformedCopy( transform.T() ) );
+}
+
+void Sphere::computeBounds(){
+
+    glm::vec4 vertices[]{
+        { .5f, .5f, .5f, 1.f }, { .5f, .5f, -.5f, 1.f },
+        { .5f, -.5f, .5f, 1.f }, { .5f, .5f, -.5f, 1.f },
+        { -.5f, .5f, .5f, 1.f }, { -.5f, .5f, -.5f, 1.f },
+        { -.5f, -.5f, .5f, 1.f }, { -.5f, .5f, -.5f, 1.f },
+    };
+
+    glm::vec3 vertices_in_world[ 8 ];
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( int i = 0; i < 8; ++i ){
+        vertices_in_world[ i ] = glm::vec3( transform.T() * vertices[ i ] );
+        max_bound = glm::max( max_bound, vertices_in_world[ i ] );
+        min_bound = glm::min( min_bound, vertices_in_world[ i ] );
+    }
+
+    pBBox = new BoundingBox( max_bound, min_bound );
+
 }
 
 glm::vec3 Sphere::ComputeNormal(const glm::vec3 &P)

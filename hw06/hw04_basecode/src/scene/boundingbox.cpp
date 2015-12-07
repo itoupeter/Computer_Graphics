@@ -89,21 +89,21 @@ BoundingBox BoundingBox::combine( const QList< Geometry * > &geometries ){
 }
 
 //---world space---
-BoundingBox BoundingBox::mesh_combine( const QList< Geometry * > &geometries ){
+//BoundingBox BoundingBox::mesh_combine( const QList< Geometry * > &geometries ){
 
-    glm::vec3 max( -1e6f );
-    glm::vec3 min( 1e6f );
+//    glm::vec3 max( -1e6f );
+//    glm::vec3 min( 1e6f );
 
-    for( Geometry *geometry : geometries ){
+//    for( Geometry *geometry : geometries ){
 
-        Triangle *triangle( static_cast< Triangle * >( geometry ) );
+//        Triangle *triangle( static_cast< Triangle * >( geometry ) );
 
-        max = glm::max( max, triangle->pBBoxInLocal->max_bound );
-        min = glm::min( min, triangle->pBBoxInLocal->min_bound );
-    }
+//        max = glm::max( max, triangle->pBBoxInLocal->max_bound );
+//        min = glm::min( min, triangle->pBBoxInLocal->min_bound );
+//    }
 
-    return BoundingBox( max, min );
-}
+//    return BoundingBox( max, min );
+//}
 
 //---UI---
 void BoundingBox::create(){

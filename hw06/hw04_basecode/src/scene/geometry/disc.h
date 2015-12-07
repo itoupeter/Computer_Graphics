@@ -14,4 +14,7 @@ public:
     virtual void ComputeArea();
 
     virtual Intersection SampleLight( float a, float b, float c );
+
+    //---BVH---
+    virtual void computeBounds();
 };

@@ -409,14 +409,14 @@ Integrator XMLReader::LoadIntegrator(QXmlStreamReader &xml_reader)
     //First check what type of integrator we're supposed to load
     QXmlStreamAttributes attribs(xml_reader.attributes());
     QStringRef type = attribs.value(QString(), QString("type"));
-    bool is_mesh = false;
+//    bool is_mesh = false;
 
     while(!xml_reader.isEndElement() || QStringRef::compare(xml_reader.name(), QString("integrator")) != 0)
     {
         xml_reader.readNext();
 
         QString tag(xml_reader.name().toString());
-        if(is_mesh && QString::compare(tag, QString("maxDepth")) == 0)
+        if(/*is_mesh &&*/ QString::compare(tag, QString("maxDepth")) == 0)
         {
             xml_reader.readNext();
             if(xml_reader.isCharacters())

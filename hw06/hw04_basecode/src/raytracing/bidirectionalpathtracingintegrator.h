@@ -13,15 +13,23 @@ public:
 
     glm::vec3 TraceRay( Ray r, unsigned int depth );
 
-    void GeneratePath( Ray ray, Geometry *pLight );
+    //---generate paths from eye and light---
+    void GeneratePath(
+            Ray ray, Geometry *pLight,
+            vector< Intersection > &vertices_eye, vector< float > &pdf_eye,
+            vector< Intersection > &vertices_light, vector< float > &pdf_light );
+
+    //---evaluate energy along path---
+    glm::vec3 EvaluatePath(
+            Ray ray, Geometry *pLight, int I, int J,
+            vector< Intersection > &vertices_eye, vector< float > &pdf_eye,
+            vector< Intersection > &vertices_light, vector< float > &pdf_light );
 
     //---test if b is visible to a---
     bool Visible( const Intersection &a, const Intersection &b );
 
-    vector< Intersection > vertices_eye;
-    vector< glm::vec3 > Ld_eye;
-    vector< Intersection > vertices_light;
-    vector< glm::vec3 > Ld_light;
+    //---sample on light---
+    Intersection light_sample;
 };
 
 #endif // BIDIRECTIONALPATHTRACINGINTEGRATOR_H

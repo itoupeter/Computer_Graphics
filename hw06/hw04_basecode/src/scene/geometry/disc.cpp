@@ -37,6 +37,33 @@ Intersection Disc::SampleLight( float a, float b, float c ){
     return GetIntersection( ray.GetTransformedCopy( transform.T() ) );
 }
 
+void Disc::computeBounds(){
+
+    static const glm::vec4 vertices[]{
+        glm::vec4( .5f, .5f, 0.f, 1.f ),
+        glm::vec4( .5f, -.5f, 0.f, 1.f ),
+        glm::vec4( -.5f, .5f, 0.f, 1.f ),
+        glm::vec4( -.5f, -.5, 0.f, 1.f ),
+    };
+
+    glm::vec3 vertices_in_world[]{
+        glm::vec3( transform.T() * vertices[ 0 ] ),
+        glm::vec3( transform.T() * vertices[ 1 ] ),
+        glm::vec3( transform.T() * vertices[ 2 ] ),
+        glm::vec3( transform.T() * vertices[ 3 ] ),
+    };
+
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( int i = 0; i < 4; ++i ){
+        max_bound = glm::max( max_bound, vertices_in_world[ i ] );
+        min_bound = glm::min( min_bound, vertices_in_world[ i ] );
+    }
+
+    pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( -.1f ) );
+}
+
 Intersection Disc::GetIntersection(Ray r)
 {
     //Transform the ray

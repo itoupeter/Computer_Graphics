@@ -2,7 +2,6 @@
 #define DIRECTLIGHTINGINTEGRATOR_H
 
 #include "raytracing/integrator.h"
-#include <random>
 
 class DirectLightingIntegrator : Integrator{
 public:
@@ -17,9 +16,3 @@ private:
 };
 
 #endif // DIRECTLIGHTINGINTEGRATOR_H
-
-/*
-#include <chrono>
-static std::uniform_real_distribution<float> rng(0, 1);
-static std::mt19937 seed(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-*/

@@ -10,7 +10,7 @@ bool compareX( const Geometry *a, const Geometry *b ){
     return a->pBBox->center[ 0 ] < b->pBBox->center[ 0 ];
 }
 
-bool compareY( const Geometry *a, const Geometry *b ){0
+bool compareY( const Geometry *a, const Geometry *b ){
     return a->pBBox->center[ 1 ] < b->pBBox->center[ 1 ];
 }
 

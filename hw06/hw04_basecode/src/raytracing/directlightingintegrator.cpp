@@ -34,11 +34,12 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
     if( isx.object_hit->material->is_light_source )
         return isx.texture_color * isx.object_hit->material->base_color;
 
+    float light_PDF( 0.f ), light_PH( 0.f );
+    float bxdf_PDF( 0.f ), bxdf_PH( 0.f );
     int flag( 3 );
 
     //---sample a random light---
     glm::vec3 light_color( 0.f );
-    float light_PDF( 0.f );
 
     if( flag & 1 ){
         float rand( distribution( generator ) );
@@ -72,6 +73,8 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
                 //---ray PDF---
                 / light_PDF
                 ;
+        }else{
+            light_PH = 0.f;
         }
     }
 
@@ -79,7 +82,6 @@ glm::vec3 DirectLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
     //---sample a random BxDF---
     glm::vec3 bxdf_color( 0.f );
-    float bxdf_PDF( 0.f );
 
     if( flag & 2 ){
         glm::vec3 wiW( 0.f );

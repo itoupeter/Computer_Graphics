@@ -8,7 +8,8 @@
 #include <QFileDialog>
 #include <renderthread.h>
 #include <raytracing/samplers/stratifiedpixelsampler.h>
-
+#include <scene/bvh.h>
+#include <QElapsedTimer>
 
 MyGL::MyGL(QWidget *parent)
     : GLWidget277(parent)
@@ -91,6 +92,7 @@ void MyGL::paintGL()
 
 void MyGL::GLDrawScene()
 {
+    //---draw scene geometries---
     for(Geometry *g : scene.objects)
     {
         if(g->drawMode() == GL_TRIANGLES)
@@ -104,6 +106,8 @@ void MyGL::GLDrawScene()
             prog_flat.draw(*this, *g);
         }
     }
+
+    //---draw scene lights---
     for(Geometry *l : scene.lights)
     {
         prog_flat.setModelMatrix(l->transform.T());
@@ -111,6 +115,12 @@ void MyGL::GLDrawScene()
     }
     prog_flat.setModelMatrix(glm::mat4(1.0f));
     prog_flat.draw(*this, scene.camera);
+
+    //---draw bounding box for scene geometries---
+    for( BoundingBox *pBBox : scene.allBBoxes ){
+        prog_flat.setModelMatrix( glm::mat4() );
+        prog_flat.draw( *this, *pBBox );
+    }
 
     //Recursively traverse the BVH hierarchy stored in the intersection engine and draw each node
 }
@@ -189,6 +199,14 @@ void MyGL::SceneLoadDialog()
     integrator.scene = &scene;
     integrator.intersection_engine = &intersection_engine;
     intersection_engine.scene = &scene;
+    //---BVH---
+    for( Geometry *pGeometry : scene.objects ){
+        pGeometry->computeBounds();
+    }
+    BVH::scene = &scene;
+    BVH::clear( intersection_engine.root );
+    intersection_engine.root = BVH::build( scene.objects, intersection_engine.root, 0 );
+
     ResizeToSceneCamera();
     update();
 
@@ -201,6 +219,10 @@ void MyGL::RaytraceScene()
     {
         return;
     }
+
+    //---timer---
+    QElapsedTimer timer;
+    timer.start();
 
 #define MULTITHREADED
 #ifdef MULTITHREADED
@@ -279,5 +301,8 @@ void MyGL::RaytraceScene()
     }
 #endif
     scene.film.WriteImage(filepath);
-    std::cout << "\n---OK!---" << std::endl;
+    std::cout << "\n"
+              << "----OK!----\n"
+              << "Time Elapsed: " << timer.elapsed()
+              << std::endl;
 }

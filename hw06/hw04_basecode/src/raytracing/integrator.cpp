@@ -1,6 +1,7 @@
 #include <raytracing/integrator.h>
 #include <raytracing/directlightingintegrator.h>
 #include <raytracing/globallightingintegrator.h>
+#include <raytracing/bidirectionalpathtracingintegrator.h>
 
 Integrator::Integrator():
     max_depth(5),
@@ -25,7 +26,7 @@ void Integrator::SetDepth( unsigned int depth ){
 
 glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
 
-#define INTEGRATOR 1
+#define INTEGRATOR 2
 
 #if INTEGRATOR == 0
     //---direct lighting---
@@ -37,6 +38,7 @@ glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
     return globalLightingIntegrator.TraceRay( r, depth );
 #elif INTEGRATOR == 2
     //---bidirectional path tracing---
-
+    static BidirectionalPathTracingIntegrator bidirectionalPathTracingIntegrator( scene, intersection_engine, max_depth );
+    return bidirectionalPathTracingIntegrator.TraceRay( r, depth );
 #endif
 }

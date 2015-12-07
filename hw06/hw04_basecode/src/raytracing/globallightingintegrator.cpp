@@ -25,7 +25,6 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
     //---global lighting---
     static DirectLightingIntegrator directLightingIntegrator( scene, intersection_engine, max_depth );
-    static BidirectionalPathTracingHelper bidirectionalPTHelper( scene, intersection_engine );
     glm::vec3 A( 0.f ), B( 1.f );
     float throughput( 1.f );
 
@@ -35,6 +34,7 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
 
         //---direct lighting---
         Ld = directLightingIntegrator.TraceRay( r, depth );
+        A += B * Ld;
 
 //#define BIDIRECTIONAL
 
@@ -77,7 +77,7 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
             throughput *= tmp * fabsf( glm::dot( wiW_bxdf, isx.normal ) );
 
             if( throughput < rand ){
-                A += B * Ld / rand;
+//                A += B * Ld / rand;
                 break;
             }
         }
@@ -95,8 +95,6 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
             Li = bxdf * fabsf( glm::dot( isx.normal, wiW_bxdf ) ) / pdf_bxdf;
             B *= Li;
         }
-
-        A += B * Ld;
 
         //---iterate---
         isx = isx_bxdf;

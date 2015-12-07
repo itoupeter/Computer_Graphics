@@ -17,4 +17,7 @@ public:
 //    float RayPDF(const Intersection &isx, const Ray &ray);
 
     virtual Intersection SampleLight( float a, float b, float c );
+
+    //---BVH---
+    virtual void computeBounds();
 };
