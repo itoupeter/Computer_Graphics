@@ -122,6 +122,14 @@ glm::vec3 DirectLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::v
     static const glm::vec3 green( 0.f, 1.f, 0.f );
 
     Ray ray( o, d - o );
+
+#define SIMPLE_TEST
+
+#ifdef SIMPLE_TEST
+    Intersection isx( intersection_engine->GetIntersection( ray ) );
+
+    return isx.object_hit == pLight ? glm::vec3( 1.f ) : glm::vec3( 0.f );
+#else
     QList< Intersection > isxes( intersection_engine->GetAllIntersections( ray ) );
 
     for( const Intersection &isx : isxes ){
@@ -137,4 +145,6 @@ glm::vec3 DirectLightingIntegrator::ShadowTest( const glm::vec3 &o, const glm::v
 
     //---impossible---
     return green;
+#endif
+
 }

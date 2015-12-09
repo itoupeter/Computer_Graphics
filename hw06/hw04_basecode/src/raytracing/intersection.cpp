@@ -20,6 +20,11 @@ IntersectionEngine::IntersectionEngine()
 
 Intersection IntersectionEngine::GetIntersection(Ray r)
 {
+#define BVH
+
+#ifdef BVH
+    return root->getIntersection( r );
+#else
     Intersection nearest;
     for(Geometry* g : scene->objects)
     {
@@ -30,6 +35,7 @@ Intersection IntersectionEngine::GetIntersection(Ray r)
         }
     }
     return nearest;
+#endif
 }
 
 bool IntersectionComp(const Intersection &lhs, const Intersection &rhs)

@@ -24,7 +24,7 @@ public:
     unsigned int sqrt_samples;//Read by MyGL and RenderThread when making PixelSamplers
 
     //---all bounding boxes to be drawn---
-    QList< BoundingBox * > allBBoxes;
+    static QList< BoundingBox * > allBBoxes;
 
     void SetCamera(const Camera &c);
 

@@ -5,6 +5,7 @@
 #include "scene/geometry/geometry.h"
 
 class Geometry;
+class Triangle;
 
 class BoundingBox : public Drawable{
 public:
@@ -17,6 +18,7 @@ public:
 
     static BoundingBox combine( const BoundingBox &a, const BoundingBox &b );
     static BoundingBox combine( const QList< Geometry * > &geometries );
+    static BoundingBox combine( const QList< Triangle * > &triangles );
 //    static BoundingBox mesh_combine( const QList< Geometry * > &geometries );
 
     glm::vec3 max_bound;

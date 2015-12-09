@@ -74,7 +74,6 @@ BoundingBox BoundingBox::combine( const BoundingBox &a, const BoundingBox &b ){
     return result;
 }
 
-//---mesh space---
 BoundingBox BoundingBox::combine( const QList< Geometry * > &geometries ){
 
     glm::vec3 max( -1e6f );
@@ -83,6 +82,19 @@ BoundingBox BoundingBox::combine( const QList< Geometry * > &geometries ){
     for( Geometry *geometry : geometries ){
         max = glm::max( max, geometry->pBBox->max_bound );
         min = glm::min( min, geometry->pBBox->min_bound );
+    }
+
+    return BoundingBox( max, min );
+}
+
+BoundingBox BoundingBox::combine( const QList< Triangle * > &triangles ){
+
+    glm::vec3 max( -1e6f );
+    glm::vec3 min( 1e6f );
+
+    for( Triangle *triangle : triangles ){
+        max = glm::max( max, triangle->pBBox->max_bound );
+        min = glm::min( min, triangle->pBBox->min_bound );
     }
 
     return BoundingBox( max, min );

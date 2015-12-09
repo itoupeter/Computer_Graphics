@@ -147,6 +147,30 @@ Ray Camera::RaycastNDC(float ndc_x, float ndc_y)
 {
     glm::vec3 P = ref + ndc_x*H + ndc_y*V;
     Ray result(eye, P - eye);
+
+    //---DoF---
+    static float lensRadius( 0.f );
+    static float focalDistance( 10.f );
+
+    if( lensRadius > 0.f ){
+
+        float rand1( distribution( generator ) );
+        float rand2( distribution( generator ) );
+
+        float sqrt_r( sqrt( rand1 ) );
+        float theta( rand2 * TWO_PI );
+
+        float lensU( sqrt_r * cos( theta ) * lensRadius );
+        float lensV( sqrt_r * sin( theta ) * lensRadius );
+
+        float ratio( focalDistance / glm::distance( ref, eye ) );
+        glm::vec3 Pfocus( eye + ratio * result.direction );
+        glm::vec3 eye_new( eye + glm::vec3( lensU, lensV, 0.f ) );
+
+        result.direction = glm::normalize( Pfocus - eye_new );
+    }
+    //---
+
     return result;
 }
 

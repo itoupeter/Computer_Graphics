@@ -2,6 +2,7 @@
 #include <la.h>
 #include <tinyobj/tiny_obj_loader.h>
 #include <iostream>
+#include <scene/bvh.h>
 
 void Triangle::ComputeArea()
 {
@@ -19,6 +20,27 @@ Intersection Triangle::SampleLight( float a, float b, float c ){
 
 void Triangle::computeBounds(){
 
+    //---transform vertices to the world space---
+    glm::vec4 vertices_in_world[]{
+        transform.T() * glm::vec4( points[ 0 ], 1.f ),
+        transform.T() * glm::vec4( points[ 1 ], 1.f ),
+        transform.T() * glm::vec4( points[ 2 ], 1.f ),
+    };
+
+    //---decide bounds---
+    glm::vec3 max_bound( -1e6f );
+    glm::vec3 min_bound( 1e6f );
+
+    for( int i = 0; i < 3; ++i ){
+        max_bound = glm::max( max_bound, glm::vec3( vertices_in_world[ i ] ) );
+        min_bound = glm::min( min_bound, glm::vec3( vertices_in_world[ i ] ) );
+    }
+
+    pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( .1f ) );
+}
+
+Mesh::~Mesh(){
+    BVH::clear( root );
 }
 
 void Mesh::ComputeArea()
@@ -44,33 +66,21 @@ void Mesh::ComputeArea()
 
 void Mesh::computeBounds(){
 
-    glm::vec3 max_bound( -1e6f );
-    glm::vec3 min_bound( 1e6f );
+//    glm::vec3 max_bound( -1e6f );
+//    glm::vec3 min_bound( 1e6f );
+
+    gFaces.clear();
 
     for( Triangle *triangle : faces ){
 
-        //---transform vertices to the world space---
-        glm::vec4 vertices_in_world[]{
-            transform.T() * glm::vec4( triangle->points[ 0 ], 1.f ),
-            transform.T() * glm::vec4( triangle->points[ 1 ], 1.f ),
-            transform.T() * glm::vec4( triangle->points[ 2 ], 1.f ),
-        };
+        //---pass transform to triangle---
+        triangle->transform = transform;
 
-        //---decide bounds---
-        glm::vec3 max_bound_tri_w( -1e6f );
-        glm::vec3 min_bound_tri_w( 1e6f );
-//        glm::vec3 max_bound_tri_l( -1e6f );
-//        glm::vec3 min_bound_tri_l( 1e6f );
-
-        for( int i = 0; i < 3; ++i ){
-            max_bound_tri_w = glm::max( max_bound_tri_w, glm::vec3( vertices_in_world[ i ] ) );
-            min_bound_tri_w = glm::min( min_bound_tri_w, glm::vec3( vertices_in_world[ i ] ) );
-//            max_bound_tri_l = glm::max( max_bound_tri_l, glm::vec3( triangle->points[ i ] ) );
-//            min_bound_tri_l = glm::min( min_bound_tri_l, glm::vec3( triangle->points[ i ] ) );
-        }
+        //---compute bounding boxes of triangles---
+        triangle->computeBounds();
 
         //---cast Triangle* to Geometry* and save to pFaces---
-//        gFaces.push_back( static_cast< Geometry * >( triangle ) );
+        gFaces.push_back( static_cast< Geometry * >( triangle ) );
 
         //---save bounding box of current triangle in world space---
 //        triangle->pBBox = new BoundingBox( max_bound_tri_w, min_bound_tri_w );
@@ -79,14 +89,14 @@ void Mesh::computeBounds(){
 //        triangle->pBBoxInLocal = new BoundingBox( max_bound_tri_l, min_bound_tri_l );
 
         //---calculate mesh bounding box in world space---
-        max_bound = glm::max( max_bound, max_bound_tri_w );
-        min_bound = glm::min( min_bound, min_bound_tri_w );
+//        max_bound = glm::max( max_bound, max_bound_tri_w );
+//        min_bound = glm::min( min_bound, min_bound_tri_w );
     }
 
-    pBBox = new BoundingBox( max_bound + glm::vec3( .1f ), min_bound - glm::vec3( .1f ) );
+    pBBox = new BoundingBox( BoundingBox::combine( faces ) );
 
     //---build BVH for mesh---
-//    root = BVH::mesh_build( gFaces, root, 0 );
+    root = BVH::build( gFaces, root, 0 );
 }
 
 int bisect_find( QList< float > &list, float c ){
@@ -191,9 +201,18 @@ glm::vec3 Mesh::ComputeNormal(const glm::vec3 &P)
 //HAVE THEM IMPLEMENT THIS
 //The ray in this function is not transformed because it was *already* transformed in Mesh::GetIntersection
 Intersection Triangle::GetIntersection(Ray r){
+
+    Ray r_world( r );
+
+    //---transform ray to local space---
+    r = r.GetTransformedCopy( transform.invT() );
+
     //1. Ray-plane intersection
     Intersection result;
-    float t =  glm::dot(plane_normal, (points[0] - r.origin)) / glm::dot(plane_normal, r.direction);
+    float t = glm::dot(plane_normal, (points[0] - r.origin) )
+            / glm::dot(plane_normal, r.direction);
+
+    if( t < 0.f ) return Intersection();
 
     glm::vec3 P = r.origin + t * r.direction;
     //2. Barycentric test
@@ -204,8 +223,11 @@ Intersection Triangle::GetIntersection(Ray r){
     float sum = s1 + s2 + s3;
 
     if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)){
-        result.t = t;
+        result.point = glm::vec3( transform.T() * glm::vec4( P, 1.f ) );
+        result.t = glm::distance( glm::vec3( result.point ), r_world.origin );
         result.texture_color = Material::GetImageColorInterp(GetUVCoordinates(glm::vec3(P)), material->texture);
+        result.normal = glm::vec3( transform.invTransT() * glm::vec4( GetNormal( P ), 0.f ) );
+        result.normal = glm::normalize( result.normal );
         result.object_hit = this;
         //TODO: Store the tangent and bitangent
 
@@ -224,13 +246,18 @@ Intersection Triangle::GetIntersection(Ray r){
 
         result.tangent = ( v02_uv[ 1 ] * v01_pos_world - v01_uv[ 1 ] * v02_pos_world )
                 / ( v02_uv[ 1 ] * v01_uv[ 0 ] - v01_uv[ 0 ] * v02_uv[ 1 ] );
+        result.tangent = glm::normalize( result.tangent );
         result.bitangent = ( v02_pos_world - v02_uv[ 0 ] * result.tangent ) / v02_uv[ 1 ];
-
+        result.bitangent = glm::normalize( result.bitangent );
     }
+
     return result;
 }
 
 Intersection Mesh::GetIntersection(Ray r){
+
+    return root->getIntersection( r );
+
     Ray r_loc = r.GetTransformedCopy(transform.invT());
     Intersection closest;
     for(int i = 0; i < faces.size(); i++){

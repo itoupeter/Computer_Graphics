@@ -1,4 +1,5 @@
 
+#include "scene.h"
 #include "scene/bvh.h"
 #include "scene/geometry/mesh.h"
 #include <algorithm>
@@ -31,14 +32,14 @@ BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth 
     //---current node---
     pNode = new BVHNode();
     pNode->pBBox = new BoundingBox( BoundingBox::combine( geometries ) );
-    pNode->pBBox->create();
-    BVH::scene->allBBoxes.push_back( pNode->pBBox );
+    if( depth < 5 ){
+        pNode->pBBox->create();
+        Scene::allBBoxes.push_back( pNode->pBBox );
+    }
 
     //---reach leaf node---
     if( geometries.size() == 1 ){
         pNode->pGeometry = geometries.front();
-        pNode->pLeft = NULL;
-        pNode->pRight = NULL;
         return pNode;
     }
 

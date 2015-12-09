@@ -9,9 +9,11 @@
 #include <raytracing/samplers/stratifiedpixelsampler.h>
 #include <scene/materials/bxdfs/lambertBxDF.h>
 
+QList< BoundingBox * > Scene::allBBoxes;
+
 Scene::Scene()
 {
-    allBBoxes.clear();
+    Scene::allBBoxes.clear();
 }
 
 void Scene::SetCamera(const Camera &c)
@@ -70,6 +72,6 @@ void Scene::Clear()
     film = Film();
 
     //---
-    allBBoxes.clear();
+    Scene::allBBoxes.clear();
     //---
 }

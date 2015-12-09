@@ -117,7 +117,7 @@ void MyGL::GLDrawScene()
     prog_flat.draw(*this, scene.camera);
 
     //---draw bounding box for scene geometries---
-    for( BoundingBox *pBBox : scene.allBBoxes ){
+    for( BoundingBox *pBBox : Scene::allBBoxes ){
         prog_flat.setModelMatrix( glm::mat4() );
         prog_flat.draw( *this, *pBBox );
     }
@@ -265,6 +265,13 @@ void MyGL::RaytraceScene()
             if(render_threads[i]->isRunning())
             {
                 still_running = true;
+
+                static int flag( 0 );
+                if( flag++ > 99 ){
+                    scene.film.WriteImage(filepath);
+                    flag = 0;
+                }
+
                 break;
             }
         }

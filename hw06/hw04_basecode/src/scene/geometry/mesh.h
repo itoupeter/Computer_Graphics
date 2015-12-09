@@ -2,6 +2,7 @@
 #include <scene/geometry/geometry.h>
 #include <openGL/drawable.h>
 #include <QList>
+#include <scene/bvhnode.h>
 
 class Triangle : public Geometry
 {
@@ -38,6 +39,7 @@ public:
 class Mesh : public Geometry
 {
 public:
+    virtual ~Mesh();
     Intersection GetIntersection(Ray r);
     void SetMaterial(Material *m);
     void create();
@@ -55,4 +57,9 @@ public:
 private:
     QList<Triangle*> faces;
     QList< float > areas_prefix;
+
+    //---BVH---
+    BVHNode *root;
+
+    QList< Geometry * > gFaces;
 };

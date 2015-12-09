@@ -34,11 +34,11 @@ INPUT(
 ./release\blinnmicrofacetbxdf.o
 ./release\specularreflectionbxdf.o
 ./release\globallightingintegrator.o
-./release\bidirectionalpathtracinghelper.o
 ./release\bidirectionalpathtracingintegrator.o
 ./release\boundingbox.o
 ./release\bvh.o
 ./release\bvhnode.o
+./release\bidirectionalpath.o
 ./release\qrc_glsl.o
 ./release\moc_mainwindow.o
 ./release\moc_mygl.o

@@ -1,6 +1,5 @@
 #include "raytracing/directlightingintegrator.h"
 #include "raytracing/globallightingintegrator.h"
-#include "raytracing/bidirectionalpathtracinghelper.h"
 
 GlobalLightingIntegrator::GlobalLightingIntegrator( Scene *scene, IntersectionEngine *intersection_engine, int max_depth ):
     Integrator(){
@@ -35,33 +34,6 @@ glm::vec3 GlobalLightingIntegrator::TraceRay( Ray r, unsigned int depth ){
         //---direct lighting---
         Ld = directLightingIntegrator.TraceRay( r, depth );
         A += B * Ld;
-
-//#define BIDIRECTIONAL
-
-#ifdef BIDIRECTIONAL
-        //---bidirectional indirect lighting---
-        vector< Intersection > path_vertices;
-        vector< glm::vec3 > path_weights;
-
-        bidirectionalPTHelper.generatePath( path_vertices, path_weights, max_depth );
-        assert( path_vertices.size() == path_weights.size() );
-
-        for( int i = 0; i < path_vertices.size(); ++i ){
-
-            Intersection &isx_nxt = path_vertices[ i ];
-            glm::vec3 wiW_nxt( glm::normalize( isx_nxt.point - isx.point ) );
-
-            if( !Visible( isx, isx_nxt ) ) continue;
-
-            Lb += 1.f / ( i + depth + 2.f )
-                    //---L---
-                    * path_weights[ i ]
-                    //---BxDF---
-                    * isx.object_hit->material->EvaluateScatteredEnergy( isx, -r.direction, wiW_nxt )
-                    //---absdot---
-                    * fabsf( glm::dot( -r.direction, isx.normal ) );
-        }
-#endif
 
         //---indirect lighting---
         float pdf_bxdf( 0.f );
