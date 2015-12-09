@@ -64,8 +64,7 @@
 		</transform>
 		<material>emissive_material</material>
 	</geometry>
-
-<!-- 	
+<!-- 
 	<geometry type="obj" name="tank">
 		<filename>wahoo_tank_tank.obj</filename>
 		<transform>
@@ -79,9 +78,9 @@
 	<geometry type="obj" name="Wahoo">
 		<filename>wahoo_tank_wahoo.obj</filename>
 		<transform>
-			<translate>0 -1.5 0</translate>
-			<rotate>0 45 0</rotate>
-			<scale>0.2 0.2 0.2</scale>
+			<translate>0 -4.5 0</translate>
+			<rotate>0 30 0</rotate>
+			<scale>.5 .5 .5</scale>
 		</transform>
 		<material>white_diffuse</material>
 	</geometry>
@@ -110,7 +109,7 @@
 	
 	<material type="default" name="wahoo_diffuse">
 		<baseColor>1 1 1</baseColor>
-		<texture>tex_nor_maps/wahoo.jpg</texture>
+		<texture>wahoo.jpg</texture>
 		<bxdf>lambert1</bxdf><weight>1</weight>
 	</material>
 
@@ -146,6 +145,6 @@
 		<maxDepth>5</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>8</pixelSampleLength>
+	<pixelSampleLength>4</pixelSampleLength>
 
 </scene>

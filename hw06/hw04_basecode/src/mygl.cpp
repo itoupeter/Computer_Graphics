@@ -10,6 +10,8 @@
 #include <raytracing/samplers/stratifiedpixelsampler.h>
 #include <scene/bvh.h>
 #include <QElapsedTimer>
+#include <vector>
+using std::vector;
 
 MyGL::MyGL(QWidget *parent)
     : GLWidget277(parent)
@@ -226,6 +228,7 @@ void MyGL::RaytraceScene()
 
 #define MULTITHREADED
 #ifdef MULTITHREADED
+
     //Set up 16 (max) threads
     unsigned int width = scene.camera.width;
     unsigned int height = scene.camera.height;
@@ -267,7 +270,7 @@ void MyGL::RaytraceScene()
                 still_running = true;
 
                 static int flag( 0 );
-                if( flag++ > 99 ){
+                if( flag++ > 999 ){
                     scene.film.WriteImage(filepath);
                     flag = 0;
                 }

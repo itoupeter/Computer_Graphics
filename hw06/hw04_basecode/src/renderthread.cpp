@@ -10,19 +10,29 @@ void RenderThread::run()
     unsigned int seed = (((x_start << 16 | x_end) ^ x_start) * ((y_start << 16 | y_end) ^ y_start));
     StratifiedPixelSampler pixel_sampler(samples_sqrt, seed);
 
+    int pseudo_rand( 0 );
+    int X_len( x_end - x_start );
+    int Y_len( y_end - y_start );
+    int XY( X_len * Y_len );
+    int X_new( 0 ), Y_new( 0 );
+
     for(unsigned int Y = y_start; Y < y_end; Y++)
     {
         for(unsigned int X = x_start; X < x_end; X++)
         {
+            pseudo_rand = ( pseudo_rand + 9699713 ) % XY;
+            Y_new = pseudo_rand / X_len + y_start;
+            X_new = pseudo_rand % X_len + x_start;
+
             glm::vec3 pixel_color;
-            QList<glm::vec2> samples = pixel_sampler.GetSamples(X, Y);
+            QList<glm::vec2> samples = pixel_sampler.GetSamples(X_new, Y_new);
             for(int i = 0; i < samples.size(); i++)
             {
                 Ray ray = camera->Raycast(samples[i]);
                 pixel_color += integrator->TraceRay(ray, 0);
             }
             pixel_color /= samples.size();
-            film->pixels[X][Y] = pixel_color;
+            film->pixels[X_new][Y_new] = pixel_color;
         }
     }
 }

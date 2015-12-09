@@ -111,9 +111,6 @@ glm::vec3 Material::GetImageColorInterp(const glm::vec2 &uv_coord, const QImage*
         float X = image->width() * uv_coord.x;
         float Y = image->height() * (1.0f - uv_coord.y);
 
-        if( X < 0 ) X = 0; if( X >= image->width() ) X = image->width() - 1;
-        if( Y < 0 ) Y = 0; if( Y >= image->width() ) Y = image->width() - 1;
-
         glm::vec2 floors = glm::vec2(floor(X), floor(Y));
         glm::vec2 ceils = glm::vec2(ceil(X), ceil(Y));
         ceils = glm::min(ceils, glm::vec2(image->width()-1, image->height()-1));
