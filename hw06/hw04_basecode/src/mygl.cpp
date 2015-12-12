@@ -263,6 +263,7 @@ void MyGL::RaytraceScene()
     do
     {
         still_running = false;
+
         for(unsigned int i = 0; i < num_render_threads; i++)
         {
             if(render_threads[i]->isRunning())
@@ -270,7 +271,7 @@ void MyGL::RaytraceScene()
                 still_running = true;
 
                 static int flag( 0 );
-                if( flag++ > 999 ){
+                if( flag++ > 99 ){
                     scene.film.WriteImage(filepath);
                     flag = 0;
                 }

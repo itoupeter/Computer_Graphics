@@ -20,7 +20,7 @@ void RenderThread::run()
     {
         for(unsigned int X = x_start; X < x_end; X++)
         {
-            pseudo_rand = ( pseudo_rand + 9699713 ) % XY;
+            pseudo_rand = ( pseudo_rand + 971 ) % XY;
             Y_new = pseudo_rand / X_len + y_start;
             X_new = pseudo_rand % X_len + x_start;
 

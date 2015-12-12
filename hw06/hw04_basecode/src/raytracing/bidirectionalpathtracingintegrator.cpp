@@ -148,9 +148,7 @@ glm::vec3 BidirectionalPathTracingIntegrator::EvaluatePath(
                 //---cosine term---
                 * fabsf( glm::dot( path.wiW_light[ i ], isx_cur.normal ) )
                 //---PDF---
-                / path.pdf_light[ i ]
-                //---direct lighting---
-                + directLightingIntegrator.TraceRay( ray_Ld, 0 );
+                / path.pdf_light[ i ];
     }
 
     //---evaluate connecting part---
@@ -167,9 +165,7 @@ glm::vec3 BidirectionalPathTracingIntegrator::EvaluatePath(
                 //---BxDF---
                 * isx_J.object_hit->material->EvaluateScatteredEnergy( isx_J, -I2J, path.wiW_light[ J - 1 ] )
                 //---cosine term---
-                * fabsf( glm::dot( path.wiW_light[ J - 1 ], isx_J.normal ) )
-                //---direct lighting---
-                + directLightingIntegrator.TraceRay( ray_Ld, 0 );
+                * fabsf( glm::dot( path.wiW_light[ J - 1 ], isx_J.normal ) );
 
         result = 1.f
                 //---L---

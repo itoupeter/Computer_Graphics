@@ -225,7 +225,7 @@ Intersection Triangle::GetIntersection(Ray r){
     if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)){
         result.point = glm::vec3( transform.T() * glm::vec4( P, 1.f ) );
         result.t = glm::distance( glm::vec3( result.point ), r_world.origin );
-        result.texture_color = Material::GetImageColorInterp(GetUVCoordinates(glm::vec3(P)), material->texture);
+        result.texture_color = Material::GetImageColorInterp(GetUVCoordinates(P), material->texture);
         result.normal = glm::vec3( transform.invTransT() * glm::vec4( GetNormal( P ), 0.f ) );
         result.normal = glm::normalize( result.normal );
         result.object_hit = this;

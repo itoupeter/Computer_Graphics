@@ -167,7 +167,7 @@ Ray Camera::RaycastNDC(float ndc_x, float ndc_y)
         glm::vec3 Pfocus( eye + ratio * result.direction );
         glm::vec3 eye_new( eye + glm::vec3( lensU, lensV, 0.f ) );
 
-        result.direction = glm::normalize( Pfocus - eye_new );
+        result = Ray( eye_new, Pfocus - eye_new );
     }
     //---
 

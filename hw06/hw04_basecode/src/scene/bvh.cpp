@@ -43,6 +43,12 @@ BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth 
         return pNode;
     }
 
+    QList< Geometry * > *lGeometries( NULL );
+    QList< Geometry * > *rGeometries( NULL );
+
+//#define SAH
+
+#ifndef SAH
     //---sort geometries according to X/Y/Z axis---
     typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
     static CompareFunc compareFunc[]{
@@ -55,88 +61,24 @@ BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth 
     int size( geometries.size() );
     int mid_size( size >> 1 );
 
-    QList< Geometry * > *lGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
-    QList< Geometry * > *rGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
+    lGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
+    rGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
+#else
+
+
+
+#endif
 
     //---build tree recurrently---
     pNode->pLeft = build( *lGeometries, pNode->pLeft, depth + 1 );
     pNode->pRight = build( *rGeometries, pNode->pRight, depth + 1 );
 
+    //---release temporary lists---
+    delete lGeometries;
+    delete rGeometries;
+
     return pNode;
 }
-
-//bool mesh_compareX( const Geometry *a, const Geometry *b ){
-
-//    const Triangle *c( static_cast< const Triangle * >( a ) );
-//    const Triangle *d( static_cast< const Triangle * >( b ) );
-
-//    return c->pBBoxInLocal->center[ 0 ] < d->pBBoxInLocal->center[ 0 ];
-//}
-
-//bool mesh_compareY( const Geometry *a, const Geometry *b ){
-
-//    const Triangle *c( static_cast< const Triangle * >( a ) );
-//    const Triangle *d( static_cast< const Triangle * >( b ) );
-
-//    return c->pBBoxInLocal->center[ 1 ] < d->pBBoxInLocal->center[ 1 ];
-//}
-
-//bool mesh_compareZ( const Geometry *a, const Geometry *b ){
-
-//    const Triangle *c( static_cast< const Triangle * >( a ) );
-//    const Triangle *d( static_cast< const Triangle * >( b ) );
-
-//    return c->pBBoxInLocal->center[ 2 ] < d->pBBoxInLocal->center[ 2 ];
-//}
-
-//BVHNode *BVH::mesh_build( QList< Geometry * > &geometries, BVHNode *pNode, int depth ){
-
-//    //---no geometry---
-//    if( geometries.size() == 0 ){
-//        QMessageBox msg;
-//        msg.setText( "No triangle in the mesh." );
-//        msg.exec();
-//        return pNode;
-//    }
-
-//    //---current node---
-//    pNode = new BVHNode();
-//    //---bounding box for visualization---
-//    pNode->pBBox = new BoundingBox( BoundingBox::mesh_combine( geometries ) );
-//    //---bounding box for intersection test---
-//    BoundingBox *pBBox( new BoundingBox( BoundingBox::combine( geometries ) ) );
-//    if( /*true ||*/ depth < 8 ){
-//        pBBox->create();
-//        Mesh::allBBoxes.push_back( pBBox );
-//    }
-
-//    //---reach leaf node---
-//    if( geometries.size() == 1 ){
-//        pNode->pGeometry = geometries.front();
-//        return pNode;
-//    }
-
-//    //---sort geometries according to X/Y/Z axis---
-//    typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
-//    static CompareFunc compareFunc[]{
-//        mesh_compareX, mesh_compareY, mesh_compareZ,
-//    };
-
-//    std::sort( geometries.begin(), geometries.end(), compareFunc[ depth % 3 ] );
-
-//    //---split into children nodes---
-//    int size( geometries.size() );
-//    int mid_size( size >> 1 );
-
-//    QList< Geometry * > *lGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
-//    QList< Geometry * > *rGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
-
-//    //---build tree recurrently---
-//    pNode->pLeft = BVH::mesh_build( *lGeometries, pNode->pLeft, depth + 1 );
-//    pNode->pRight = BVH::mesh_build( *rGeometries, pNode->pRight, depth + 1 );
-
-//    return pNode;
-//}
 
 void BVH::clear( BVHNode *pNode ){
 

@@ -68,6 +68,9 @@ BoundingBox BoundingBox::combine( const BoundingBox &a, const BoundingBox &b ){
 
     BoundingBox result;
 
+    if( glm::distance2( a.min_bound, a.max_bound ) < 1e-3 ) return result = b;
+    if( glm::distance2( b.min_bound, b.max_bound ) < 1e-3 ) return result = a;
+
     result.setBounds( glm::max( a.max_bound, b.max_bound ),
                       glm::min( a.min_bound, b.min_bound ) );
 

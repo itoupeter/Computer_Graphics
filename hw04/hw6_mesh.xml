@@ -15,7 +15,7 @@
 			<translate>0 0 -5</translate>
 			<scale>10 10 1</scale>
 		</transform>
-		<material>textured_diffuse</material>
+		<material>yellow_diffuse</material>
 	</geometry>
 
 	<geometry type="square" name="Right Wall">
@@ -58,14 +58,14 @@
 		<filename>dodecahedron.obj</filename>
 		<transform>
 			<translate>0 0 0</translate>
-			<scale>1 1 1</scale>
+			<scale>2 2 2</scale>
 		</transform>
-		<material>yellow_diffuse</material>
+		<material>wahoo_diffuse</material>
 	</geometry>
 
 	<geometry type="sphere" name="White Sphere">
 		<transform>
-			<translate>-3 0 2</translate>
+			<translate>-3 -2 2</translate>
 			<scale>4 4 4</scale>
 		</transform>
 		<material>plastic_material</material>
@@ -99,11 +99,17 @@
 		<baseColor>1 1 0.25</baseColor>
 		<bxdf>lambert1</bxdf>
 	</material>
-
+	
 	<material type="default" name="textured_diffuse">
 		<baseColor>1 1 1</baseColor>
 		<texture>tex_nor_maps/165.jpg</texture>
 		<normalMap>tex_nor_maps/165_norm.jpg</normalMap>
+		<bxdf>lambert1</bxdf>
+	</material>
+	
+	<material type="default" name="wahoo_diffuse">
+		<baseColor>1 1 1</baseColor>
+		<texture>wahoo.jpg</texture>
 		<bxdf>lambert1</bxdf>
 	</material>
 
@@ -129,9 +135,9 @@
 	</bxdf>
 
 	<integrator type="raytrace">
-		<maxDepth>5</maxDepth>
+		<maxDepth>2</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>4</pixelSampleLength>
+	<pixelSampleLength>1</pixelSampleLength>
 
 </scene>

@@ -14,8 +14,10 @@ void Film::SetDimensions(unsigned int w, unsigned int h)
     this->height = h;
     pixels.clear();
     pixels = std::vector<std::vector<glm::vec3>>(width);
+    pixels_weights = std::vector<std::vector<int>>(width);
     for(unsigned int i = 0; i < width; i++){
         pixels[i] = std::vector<glm::vec3>(height);
+        pixels_weights[i] = std::vector<int>(height, 0);
     }
 }
 
