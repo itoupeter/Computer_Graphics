@@ -79,7 +79,7 @@
 		<filename>wahoo_tank_wahoo.obj</filename>
 		<transform>
 			<translate>0 -4.5 0</translate>
-			<rotate>-45 30 0</rotate>
+			<rotate>-30 30 0</rotate>
 			<scale>.5 .5 .5</scale>
 		</transform>
 		<material>wahoo_diffuse</material>
@@ -143,6 +143,6 @@
 		<maxDepth>2</maxDepth>
 	</integrator>
 
-	<pixelSampleLength>1</pixelSampleLength>
+	<pixelSampleLength>4</pixelSampleLength>
 
 </scene>

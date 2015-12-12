@@ -64,6 +64,15 @@ bool BoundingBox::getIntersection( const Ray &r ){
     return true;
 }
 
+float BoundingBox::area(){
+
+    float width( max_bound[ 0 ] - min_bound[ 0 ] );
+    float height( max_bound[ 1 ] - min_bound[ 1 ] );
+    float depth( max_bound[ 2 ] - min_bound[ 2 ] );
+
+    return width * height * depth;
+}
+
 BoundingBox BoundingBox::combine( const BoundingBox &a, const BoundingBox &b ){
 
     BoundingBox result;

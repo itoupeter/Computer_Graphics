@@ -15,6 +15,7 @@ public:
     void setBounds( const glm::vec3 &max_bound, const glm::vec3 &min_bound );
 
     bool getIntersection( const Ray &r );
+    float area();
 
     static BoundingBox combine( const BoundingBox &a, const BoundingBox &b );
     static BoundingBox combine( const QList< Geometry * > &geometries );

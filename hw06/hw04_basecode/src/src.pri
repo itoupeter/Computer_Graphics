@@ -42,7 +42,8 @@ SOURCES += \
     $$PWD/scene/boundingbox.cpp \
     $$PWD/scene/bvh.cpp \
     $$PWD/scene/bvhnode.cpp \
-    $$PWD/raytracing/bidirectionalpath.cpp
+    $$PWD/raytracing/bidirectionalpath.cpp \
+    $$PWD/scene/sah.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -90,4 +91,5 @@ HEADERS += \
     $$PWD/scene/boundingbox.h \
     $$PWD/scene/bvh.h \
     $$PWD/scene/bvhnode.h \
-    $$PWD/raytracing/bidirectionalpath.h
+    $$PWD/raytracing/bidirectionalpath.h \
+    $$PWD/scene/sah.h

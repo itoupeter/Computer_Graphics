@@ -12,34 +12,18 @@ struct SAHBucket{
 
 class SAH{
 public:
-    SAH();
+    SAH(){}
 
     void split( QList< Geometry * > &geometries,
                 QList< Geometry * > &lGeometries,
                 QList< Geometry * > &rGeometries,
-                int dim );
-
-    void initializeBucket();
+                int dim, BoundingBox *whole );
 
 private:
-    const int nBuckets = 12;
+    static const int nBuckets = 12;
 
     SAHBucket buckets[ nBuckets ];
+    std::vector< float > costs;
 };
 
-void SAH::split(
-        QList<Geometry *> &geometries,
-        QList<Geometry *> &lGeometries,
-        QList<Geometry *> &rGeometries,
-        int dim ){
-
-    int nGeometries( geometries.size() );
-    float left_wall( 1e5f ), right_wall( 0.f );
-
-    for( int i = 0; i < nGeometries; ++i ){
-        if( )
-    }
-
-}
 #endif // SAH_H
-

@@ -1,6 +1,7 @@
 
 #include "scene.h"
 #include "scene/bvh.h"
+#include "scene/sah.h"
 #include "scene/geometry/mesh.h"
 #include <algorithm>
 #include <QMessageBox>
@@ -43,39 +44,34 @@ BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth 
         return pNode;
     }
 
-    QList< Geometry * > *lGeometries( NULL );
-    QList< Geometry * > *rGeometries( NULL );
+    QList< Geometry * > lGeometries;
+    QList< Geometry * > rGeometries;
 
-//#define SAH
+    if( geometries.size() <= 4 ){
+        //---sort geometries according to X/Y/Z axis---
+        typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
+        static CompareFunc compareFunc[]{
+            compareX, compareY, compareZ,
+        };
 
-#ifndef SAH
-    //---sort geometries according to X/Y/Z axis---
-    typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
-    static CompareFunc compareFunc[]{
-        compareX, compareY, compareZ,
-    };
+        std::sort( geometries.begin(), geometries.end(), compareFunc[ depth % 3 ] );
 
-    std::sort( geometries.begin(), geometries.end(), compareFunc[ depth % 3 ] );
+        //---split into children nodes---
+        int size( geometries.size() );
+        int mid_size( size >> 1 );
 
-    //---split into children nodes---
-    int size( geometries.size() );
-    int mid_size( size >> 1 );
+        lGeometries = QList< Geometry * >( geometries.mid( 0, mid_size ) );
+        rGeometries = QList< Geometry * >( geometries.mid( mid_size, size ) );
+    }else{
+        //---use SAH---
+        SAH sah;
 
-    lGeometries = new QList< Geometry * >( geometries.mid( 0, mid_size ) );
-    rGeometries = new QList< Geometry * >( geometries.mid( mid_size, size ) );
-#else
-
-
-
-#endif
+        sah.split( geometries, lGeometries, rGeometries, depth % 3, pNode->pBBox );
+    }
 
     //---build tree recurrently---
-    pNode->pLeft = build( *lGeometries, pNode->pLeft, depth + 1 );
-    pNode->pRight = build( *rGeometries, pNode->pRight, depth + 1 );
-
-    //---release temporary lists---
-    delete lGeometries;
-    delete rGeometries;
+    pNode->pLeft = build( lGeometries, pNode->pLeft, depth + 1 );
+    pNode->pRight = build( rGeometries, pNode->pRight, depth + 1 );
 
     return pNode;
 }

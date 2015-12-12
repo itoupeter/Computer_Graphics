@@ -26,7 +26,7 @@ void Integrator::SetDepth( unsigned int depth ){
 
 glm::vec3 Integrator::TraceRay( Ray r, unsigned int depth ){
 
-#define INTEGRATOR 2
+#define INTEGRATOR 1
 
 #if INTEGRATOR == 0
     //---direct lighting---
