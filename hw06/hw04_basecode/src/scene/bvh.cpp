@@ -48,6 +48,7 @@ BVHNode *BVH::build( QList< Geometry * > &geometries, BVHNode *pNode, int depth 
     QList< Geometry * > rGeometries;
 
     if( geometries.size() <= 4 ){
+        //---use geometry count---
         //---sort geometries according to X/Y/Z axis---
         typedef bool ( *CompareFunc )( const Geometry *, const Geometry * );
         static CompareFunc compareFunc[]{

@@ -70,7 +70,7 @@ float BoundingBox::area(){
     float height( max_bound[ 1 ] - min_bound[ 1 ] );
     float depth( max_bound[ 2 ] - min_bound[ 2 ] );
 
-    return width * height * depth;
+    return 2.f * ( width * height + height * depth + depth * width );
 }
 
 BoundingBox BoundingBox::combine( const BoundingBox &a, const BoundingBox &b ){
