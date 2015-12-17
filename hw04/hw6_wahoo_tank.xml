@@ -64,7 +64,7 @@
 		</transform>
 		<material>emissive_material</material>
 	</geometry>
-<!-- 
+
 	<geometry type="obj" name="tank">
 		<filename>wahoo_tank_tank.obj</filename>
 		<transform>
@@ -74,7 +74,7 @@
 		</transform>
 		<material>white_diffuse</material>
 	</geometry>
- -->	
+ 
 	<geometry type="obj" name="Wahoo">
 		<filename>wahoo_tank_wahoo.obj</filename>
 		<transform>

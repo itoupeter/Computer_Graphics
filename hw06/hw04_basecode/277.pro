@@ -63,3 +63,6 @@ address_sanitizer {
 HEADERS +=
 
 SOURCES +=
+
+DISTFILES += \
+    glsl/progressive.vert.glsl
