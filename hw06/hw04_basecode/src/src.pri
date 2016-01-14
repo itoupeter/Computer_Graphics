@@ -43,7 +43,8 @@ SOURCES += \
     $$PWD/scene/bvh.cpp \
     $$PWD/scene/bvhnode.cpp \
     $$PWD/raytracing/bidirectionalpath.cpp \
-    $$PWD/scene/sah.cpp
+    $$PWD/scene/sah.cpp \
+    $$PWD/openGL/canvas.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
@@ -92,4 +93,5 @@ HEADERS += \
     $$PWD/scene/bvh.h \
     $$PWD/scene/bvhnode.h \
     $$PWD/raytracing/bidirectionalpath.h \
-    $$PWD/scene/sah.h
+    $$PWD/scene/sah.h \
+    $$PWD/openGL/canvas.h

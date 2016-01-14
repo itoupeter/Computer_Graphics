@@ -6,9 +6,11 @@
 #include <scene/geometry/geometry.h>
 #include <scene/materials/bxdfs/bxdf.h>
 #include <scene/boundingbox.h>
+#include <scene/geometry/square.h>
 
 class Geometry;
 class Material;
+class SquarePlane;
 
 class Scene
 {
@@ -25,6 +27,9 @@ public:
 
     //---all bounding boxes to be drawn---
     static QList< BoundingBox * > allBBoxes;
+
+    //---square plane for progressive rendering---
+    SquarePlane* canvas;
 
     void SetCamera(const Camera &c);
 

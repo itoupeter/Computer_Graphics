@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QThread>
+#include <QMutex>
 #include <raytracing/film.h>
 #include <scene/scene.h>
 #include <raytracing/integrator.h>
@@ -10,10 +11,15 @@ glm::vec3 ComponentMult(const glm::vec3 &a, const glm::vec3 &b);
 class RenderThread : public QThread
 {
 public:
-    RenderThread(unsigned int xstart, unsigned int xend,
-            unsigned int ystart, unsigned int yend,
+    RenderThread(
             unsigned int samplesSqrt, unsigned int depth,
             Film* f, Camera* c, Integrator* i);
+
+    //---pixel coordinates---
+    static QList< int > pixel_coords;
+
+    //---mutex---
+    static QMutex mutex;
 
 protected:
     //This overrides the functionality of QThread::run
@@ -22,7 +28,6 @@ protected:
 
 
 
-    unsigned int x_start, x_end, y_start, y_end;
     unsigned int samples_sqrt;//The square root of the number of rays to cast per pixel
     unsigned int max_depth;
     Film* film;

@@ -1,11 +1,13 @@
-attribute vec4 qt_Vertex;
-attribute vec4 qt_MultiTexCoord0;
-uniform mat4 qt_ModelViewProjectionMatrix;
-varying vec4 qt_TexCoord0;
+#version 150
+// ^ Change this to version 130 if you have compatibility issues
 
-void main(void)
-{
-    gl_Position = qt_ModelViewProjectionMatrix * qt_Vertex;
-    qt_TexCoord0 = qt_MultiTexCoord0;
+in vec3 vs_position;
+in vec2 vs_texcoord;
+out vec2 fs_texcoord;
+
+void main( void ){
+
+	gl_Position = vec4( vs_position, 1.0 );
+	fs_texcoord = vs_texcoord;
+	
 }
-

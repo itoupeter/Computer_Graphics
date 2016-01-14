@@ -64,5 +64,4 @@ HEADERS +=
 
 SOURCES +=
 
-DISTFILES += \
-    glsl/progressive.vert.glsl
+DISTFILES +=

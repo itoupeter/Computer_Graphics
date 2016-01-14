@@ -9,6 +9,7 @@
 #include <renderthread.h>
 #include <raytracing/samplers/stratifiedpixelsampler.h>
 #include <scene/bvh.h>
+#include <openGL/canvas.h>
 #include <QElapsedTimer>
 #include <vector>
 using std::vector;
@@ -86,10 +87,18 @@ void MyGL::paintGL()
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#define PROGRESSIVE
+
+#ifdef PROGRESSIVE
+    static Canvas canvas;
+
+    canvas.draw( this );
+#else
     // Update the viewproj matrix
     prog_lambert.setViewProjMatrix(gl_camera.getViewProj());
     prog_flat.setViewProjMatrix(gl_camera.getViewProj());
     GLDrawScene();
+#endif
 }
 
 void MyGL::GLDrawScene()
@@ -120,11 +129,9 @@ void MyGL::GLDrawScene()
 
     //---draw bounding box for scene geometries---
     for( BoundingBox *pBBox : Scene::allBBoxes ){
-        prog_flat.setModelMatrix( glm::mat4() );
+        prog_flat.setModelMatrix( glm::mat4( 1.f ) );
         prog_flat.draw( *this, *pBBox );
     }
-
-    //Recursively traverse the BVH hierarchy stored in the intersection engine and draw each node
 }
 
 void MyGL::ResizeToSceneCamera()
@@ -228,37 +235,39 @@ void MyGL::RaytraceScene()
 
 #define MULTITHREADED
 #ifdef MULTITHREADED
-
-    //Set up 16 (max) threads
-    unsigned int width = scene.camera.width;
-    unsigned int height = scene.camera.height;
-    unsigned int x_block_size = (width >= 4 ? width/4 : 1);
-    unsigned int y_block_size = (height >= 4 ? height/4 : 1);
-    unsigned int x_block_count = width > 4 ? width/x_block_size : 1;
-    unsigned int y_block_count = height > 4 ? height/y_block_size : 1;
-    if(x_block_count * x_block_size < width) x_block_count++;
-    if(y_block_count * y_block_size < height) y_block_count++;
-
-    unsigned int num_render_threads = x_block_count * y_block_count;
+    int width( scene.camera.width );
+    int height( scene.camera.height );
+    int num_render_threads( 4 );
     RenderThread **render_threads = new RenderThread*[num_render_threads];
 
-    //Launch the render threads we've made
-    for(unsigned int Y = 0; Y < y_block_count; Y++)
-    {
-        //Compute the columns of the image that the thread should render
-        unsigned int y_start = Y * y_block_size;
-        unsigned int y_end = glm::min((Y + 1) * y_block_size, height);
-        for(unsigned int X = 0; X < x_block_count; X++)
-        {
-            //Compute the rows of the image that the thread should render
-            unsigned int x_start = X * x_block_size;
-            unsigned int x_end = glm::min((X + 1) * x_block_size, width);
-            //Create and run the thread
-            render_threads[Y * x_block_count + X] = new RenderThread(x_start, x_end, y_start, y_end, scene.sqrt_samples, 5, &(scene.film), &(scene.camera), &(integrator));
-            render_threads[Y * x_block_count + X]->start();
+    //---initialize pixel coordinates array---
+    std::default_random_engine generator0( time( 0 ) );
+    std::uniform_real_distribution< double > distribution0( 0., .999 );
+    QList< int > &pixel_coords = RenderThread::pixel_coords;
+    int nCoords( 0 );
+
+    pixel_coords.clear();
+    for( int i = 0; i < height; ++i ){
+        for( int j = 0; j < width; ++j ){
+            pixel_coords.push_back( ( i << 16 ) | j );
+            ++nCoords;
+
+            int a( nCoords * distribution0( generator0 ) );
+            int b( nCoords - 1 );
+            int tmp( pixel_coords[ a ] );
+
+            pixel_coords[ a ] = pixel_coords[ b ];
+            pixel_coords[ b ] = tmp;
         }
     }
 
+    //---launch thread---
+    for( int i = 0; i < num_render_threads; ++i ){
+        render_threads[ i ] = new RenderThread( scene.sqrt_samples, 5, &(scene.film), &(scene.camera), &(integrator) );
+        render_threads[ i ]->start();
+    }
+
+    //---display image progressively---
     bool still_running;
     do
     {
@@ -271,9 +280,10 @@ void MyGL::RaytraceScene()
                 still_running = true;
 
                 static int flag( 0 );
-                if( flag++ > 99 ){
-                    scene.film.WriteImage(filepath);
+                if( flag++ > 999 ){
                     flag = 0;
+                    scene.film.WriteImage(filepath);
+                    update();
                 }
 
                 break;
