@@ -1,4 +1,4 @@
-# CIS560
+# Computer Graphics
 CIS 560 Coursework
 
 Implemented simple raytracer<br>
