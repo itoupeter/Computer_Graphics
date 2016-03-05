@@ -19,10 +19,12 @@ GLWidget277::~GLWidget277()
 {
 }
 
-inline const char *glGS(GLenum e)
-{
-    return reinterpret_cast<const char *>(glGetString(e));
-}
+//inline const char *glGS(GLenum e)
+//{
+//    return reinterpret_cast<const char *>(glGetString(e));
+//}
+
+#define glGS( x ) reinterpret_cast< const char * >( glGetString( x ) )
 
 void GLWidget277::debugContextVersion()
 {

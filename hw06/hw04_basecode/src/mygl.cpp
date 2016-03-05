@@ -186,7 +186,8 @@ void MyGL::keyPressEvent(QKeyEvent *e)
 
 void MyGL::SceneLoadDialog()
 {
-    QString filepath = QFileDialog::getOpenFileName(0, QString("Load Scene"), QString("../scene_files"), tr("*.xml"));
+//    QString filepath = QFileDialog::getOpenFileName(0, QString("Load Scene"), QString("../scene_files"), tr("*.xml"));
+    QString filepath = "../veach_mis.xml";
     if(filepath.length() == 0)
     {
         return;
