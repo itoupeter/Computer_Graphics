@@ -22,7 +22,8 @@ Implemented simple raytracer<br>
 <img src="./hw04/HW04_results/mesh_light.bmp" height="200"></img>
 <img src="./hw04/HW04_results/textured_light.bmp" height="200"></img><br>
 -Direct + Indirect lighting<br>
-<img src="./hw04/HW05_results/lambert_not_divided_by_pdf.bmp" height="200"></img><br>
+<img src="./hw04/HW05_results/lambert_not_divided_by_pdf.bmp" height="200"></img>
+<img src="./hw04/HW04_results/wahoo.bmp" height="200"></img><br><br>
 -Indirect lighting VS. Bidirectional lighting, depth of field<br>
 <img src="./hw06/HW06_results/0.bmp" height="200"></img>
 <img src="./hw06/HW06_results/1.bmp" height="200"></img>
