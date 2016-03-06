@@ -1,7 +1,7 @@
 # Computer Graphics
-CIS 560 Coursework
-
+## CIS 560 Coursework
 Implemented simple raytracer<br>
+<img src="./hw04/HW06_results/wahoo.bmp" height="400"></img><br>
 -Normal<br>
 <img src="./hw01/hw01_results/01.bmp" height="200"></img>
 <img src="./hw01/hw01_results/02.bmp" height="200"></img>
